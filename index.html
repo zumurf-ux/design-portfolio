@@ -312,9 +312,25 @@
       transition: opacity .25s var(--ease);
     }
     .work-card::after {
+      content: none;
+    }
+    .work-frame {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      border-radius: 8px;
+      background: #1a1a1a;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+      -webkit-mask-image: -webkit-radial-gradient(white, black);
+    }
+    .work-frame::after {
       content: "";
       position: absolute;
       inset: 0;
+      border-radius: inherit;
       background:
         linear-gradient(180deg, rgba(0,0,0,var(--shade, 0)) 0%, rgba(0,0,0,var(--shade, 0)) 100%),
         linear-gradient(180deg, transparent 58%, rgba(0,0,0,.62) 100%);
@@ -323,7 +339,7 @@
     .work-img {
       position: relative;
       z-index: 1;
-      border-radius: 8px;
+      border-radius: 0;
       width: 100%;
       height: 100%;
       max-height: none;
@@ -337,6 +353,9 @@
       display: block;
     }
     .work-card.is-html::after {
+      content: none;
+    }
+    .work-card.is-html .work-frame::after {
       background:
         linear-gradient(180deg, rgba(0,0,0,var(--shade, 0)) 0%, rgba(0,0,0,var(--shade, 0)) 100%),
         linear-gradient(180deg, transparent 68%, rgba(0,0,0,.16) 100%);
@@ -911,6 +930,7 @@
     let activeSourceIndex = -1;
     let detailClosing = false;
     let overlayTap = null;
+    let detailHistoryOpen = false;
     const visualState = new WeakMap();
     const visibleRange = 2.65;
 
@@ -929,7 +949,7 @@
       state.current = 0;
       track.innerHTML = state.items.map((item, index) => `
         <article class="work-card ${isHtmlMedia(item, item.html || item.image || "") ? "is-html" : ""}" data-index="${index}">
-          ${renderCardMedia(item)}
+          <div class="work-frame">${renderCardMedia(item)}</div>
           <div class="work-meta">
             <h2 class="work-title">${item.title}</h2>
           </div>
@@ -1038,7 +1058,7 @@
     }
 
     function startFreeGlide(extraVelocity = 0) {
-      state.glideVelocity = Math.max(-.42, Math.min(.42, extraVelocity * 1.45));
+      state.glideVelocity = Math.max(-.56, Math.min(.56, extraVelocity * 1.9));
       dragHint.classList.add("is-quiet");
       startAnimation();
     }
@@ -1055,11 +1075,11 @@
       else {
         if (!state.dragging && Math.abs(state.glideVelocity) > .0004) {
           state.target = clampIndex(state.target + state.glideVelocity);
-          state.glideVelocity *= .94;
+          state.glideVelocity *= .965;
         } else if (!state.dragging) {
           state.glideVelocity = 0;
         }
-        state.current += (state.target - state.current) * (state.dragging ? .58 : .16);
+        state.current += (state.target - state.current) * (state.dragging ? .62 : .13);
       }
 
       const offset = -state.current * state.cardStep;
@@ -1164,8 +1184,8 @@
       const dy = event.clientY - state.startY;
       const now = performance.now();
       if (Math.hypot(dx, dy) > 8) state.moved = true;
-      state.target = clampIndex(state.startTarget - (dx * 1.08) / state.cardStep);
-      state.velocity = -((event.clientX - state.lastX) / Math.max(8, now - state.lastTime)) * 16 / state.cardStep;
+      state.target = clampIndex(state.startTarget - (dx * 1.18) / state.cardStep);
+      state.velocity = -((event.clientX - state.lastX) / Math.max(8, now - state.lastTime)) * 19 / state.cardStep;
       motionCue.style.setProperty("--drag-pull", String(Math.max(-1, Math.min(1, dx / 86))));
       state.lastX = event.clientX;
       state.lastTime = now;
@@ -1192,7 +1212,7 @@
           return;
         }
       }
-      state.target = clampIndex(state.current + state.velocity * .78);
+      state.target = clampIndex(state.current + state.velocity * .95);
       startFreeGlide(state.velocity);
     }
 
@@ -1279,12 +1299,23 @@
       overlay.classList.add("is-visible");
       overlay.setAttribute("aria-hidden", "false");
       document.body.style.overflow = "hidden";
+      if (!detailHistoryOpen) {
+        try {
+          history.pushState({ showroomDetail: true }, "", window.location.href);
+          detailHistoryOpen = true;
+        } catch (error) {}
+      }
       const detailScroller = overlay.querySelector(".detail");
       if (detailScroller) detailScroller.scrollTop = 0;
     }
 
-    function closeDetail() {
+    function closeDetail(fromHistory = false) {
       if (detailClosing || !overlay.classList.contains("is-open")) return;
+      if (!fromHistory && detailHistoryOpen) {
+        history.back();
+        return;
+      }
+      detailHistoryOpen = false;
       detailClosing = true;
       overlay.classList.remove("is-opening");
       overlay.classList.add("is-closing");
@@ -1385,6 +1416,9 @@
       if (event.key === "Escape") closeDetail();
       if (event.key === "ArrowRight") { state.target = clampIndex(state.index + 1); state.index = state.target; state.glideVelocity = 0; startAnimation(); }
       if (event.key === "ArrowLeft") { state.target = clampIndex(state.index - 1); state.index = state.target; state.glideVelocity = 0; startAnimation(); }
+    });
+    window.addEventListener("popstate", () => {
+      if (overlay.classList.contains("is-open")) closeDetail(true);
     });
     window.addEventListener("resize", () => {
       measureStep();

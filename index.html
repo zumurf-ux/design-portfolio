@@ -1063,12 +1063,6 @@
       });
     }
 
-    function preloadDetailImagesInBackground() {
-      const mainUrls = new Set(collectMainImageUrls(portfolioItems));
-      const detailUrls = collectDetailImageUrls(portfolioItems).filter(src => !mainUrls.has(src));
-      preloadUrls(detailUrls, null, 2);
-    }
-
     function finishLoading() {
       document.body.classList.remove("is-loading");
       if (!loadingScreen) return;
@@ -1528,7 +1522,6 @@
       await preloadMainImages();
       updateTransforms(true);
       finishLoading();
-      preloadDetailImagesInBackground();
     }
 
     initShowroom().catch(() => {

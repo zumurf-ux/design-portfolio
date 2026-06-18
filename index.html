@@ -804,6 +804,25 @@
       }
     }
 
+    function sampleImageAverageLuminance(img) {
+      if (!img || !img.complete || !img.naturalWidth || !logoToneCtx) return null;
+      try {
+        const size = 8;
+        logoToneCanvas.width = size;
+        logoToneCanvas.height = size;
+        logoToneCtx.clearRect(0, 0, size, size);
+        logoToneCtx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, size, size);
+        const data = logoToneCtx.getImageData(0, 0, size, size).data;
+        let total = 0;
+        for (let i = 0; i < data.length; i += 4) {
+          total += (data[i] * .299) + (data[i + 1] * .587) + (data[i + 2] * .114);
+        }
+        return total / (data.length / 4);
+      } catch (error) {
+        return null;
+      }
+    }
+
     function updateLogoTone() {
       logoToneTicking = false;
       if (!brandLogo) return;
@@ -813,11 +832,69 @@
         [rect.left + rect.width * .5, rect.top + rect.height * .58],
         [rect.left + rect.width * .78, rect.top + rect.height * .58]
       ];
+      if (overlay.classList.contains("is-open")) {
+        const detailImages = Array.from(detailMedia.querySelectorAll(".detail-image"))
+          .filter(img => img.complete && img.naturalWidth);
+        const targetImage = detailImages.find(img => {
+          const imageRect = img.getBoundingClientRect();
+          return imageRect.bottom > rect.top - 32 && imageRect.top < rect.bottom + 80;
+        }) || detailImages.find(img => {
+          const imageRect = img.getBoundingClientRect();
+          return imageRect.bottom > 0 && imageRect.top < window.innerHeight;
+        }) || detailImages[0];
+        if (targetImage) {
+          const imageRect = targetImage.getBoundingClientRect();
+          const values = points
+            .map(([x, y]) => {
+              const sampleX = Math.min(imageRect.right - 1, Math.max(imageRect.left + 1, x));
+              const sampleY = Math.min(imageRect.bottom - 1, Math.max(imageRect.top + 1, y));
+              return sampleImageLuminance(targetImage, sampleX, sampleY);
+            })
+            .filter(value => value !== null);
+          if (values.length) {
+            const detailTone = values.reduce((sum, value) => sum + value, 0) / values.length;
+            brandLogo.classList.toggle("is-light", detailTone < 142);
+            return;
+          }
+          const averageTone = sampleImageAverageLuminance(targetImage);
+          if (averageTone !== null) {
+            brandLogo.classList.toggle("is-light", averageTone < 128);
+            return;
+          }
+        }
+        if (detailImages.length) {
+          brandLogo.classList.remove("is-light");
+          return;
+        }
+      }
       const luminances = [];
       points.forEach(([x, y]) => {
-        const element = document.elementFromPoint(x, y);
-        const img = element && (element.matches(".work-img") ? element : element.closest(".work-frame")?.querySelector(".work-img"));
-        const luminance = sampleImageLuminance(img, x, y);
+        const stack = document.elementsFromPoint ? document.elementsFromPoint(x, y) : [document.elementFromPoint(x, y)];
+        let sampleX = x;
+        let sampleY = y;
+        let img = stack.find(element => element && element.matches && element.matches(".detail-image"));
+        if (!img) {
+          img = stack
+            .map(element => element && element.closest && element.closest(".detail-gallery")?.querySelector(".detail-image"))
+            .find(Boolean);
+        }
+        if (!img) {
+          img = stack.find(element => element && element.matches && element.matches(".work-img"));
+        }
+        if (!img) {
+          img = stack
+            .map(element => element && element.closest && element.closest(".work-frame")?.querySelector(".work-img"))
+            .find(Boolean);
+        }
+        if (!img && overlay.classList.contains("is-open")) {
+          img = detailMedia.querySelector(".detail-image");
+          if (img) {
+            const imageRect = img.getBoundingClientRect();
+            sampleX = Math.min(imageRect.right - 1, Math.max(imageRect.left + 1, x));
+            sampleY = Math.min(imageRect.bottom - 1, Math.max(imageRect.top + 1, y));
+          }
+        }
+        const luminance = sampleImageLuminance(img, sampleX, sampleY);
         if (luminance !== null) luminances.push(luminance);
       });
       const average = luminances.length ? luminances.reduce((sum, value) => sum + value, 0) / luminances.length : 245;
@@ -1305,12 +1382,18 @@
           ${gallery.map((src, index) => renderDetailMedia(item, src, index)).join("")}
         </div>
       `;
+      detailMedia.querySelectorAll(".detail-image").forEach(img => {
+        if (img.complete) scheduleLogoToneUpdate();
+        else img.addEventListener("load", scheduleLogoToneUpdate, { once: true });
+      });
       overlay.classList.add("is-open");
       overlay.setAttribute("aria-hidden", "false");
       requestAnimationFrame(() => {
         lockPage();
         requestAnimationFrame(() => {
           overlay.classList.add("is-visible");
+          scheduleLogoToneUpdate();
+          setTimeout(scheduleLogoToneUpdate, 180);
         });
       });
       if (!detailHistoryOpen) {
@@ -1345,6 +1428,7 @@
         activeSourceCard = null;
         activeSourceIndex = -1;
         detailClosing = false;
+        scheduleLogoToneUpdate();
       }, 360);
     }
 
@@ -1430,6 +1514,8 @@
     overlay.addEventListener("pointermove", overlayPointerMove);
     overlay.addEventListener("pointerup", overlayPointerUp);
     overlay.addEventListener("pointercancel", () => { overlayTap = null; });
+    const detailScrollArea = overlay.querySelector(".detail");
+    if (detailScrollArea) detailScrollArea.addEventListener("scroll", scheduleLogoToneUpdate, { passive: true });
     window.addEventListener("keydown", event => {
       if (event.key === "Escape") closeDetail();
       if (event.key === "ArrowRight") { state.target = clampIndex(state.index + 1); state.index = state.target; state.glideVelocity = 0; startAnimation(); }

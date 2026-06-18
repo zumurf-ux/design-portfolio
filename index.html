@@ -703,7 +703,7 @@
     <div class="loading-mark">
       <img class="loading-logo" src="images/type-logo.png" alt="TheDesignUncle">
       <div class="loading-line" aria-hidden="true"></div>
-      <div class="loading-text">LOADING</div>
+      <div class="loading-text" id="loadingText">LOADING</div>
     </div>
   </div>
   <script src="gallery-data.js"></script>
@@ -923,6 +923,7 @@
     const detailDesc = document.getElementById("detailDesc");
     const detailSpecs = document.getElementById("detailSpecs");
     const loadingScreen = document.getElementById("loadingScreen");
+    const loadingText = document.getElementById("loadingText");
 
     let cards = [];
     let shadows = [];
@@ -934,7 +935,7 @@
     let overlayTap = null;
     let detailHistoryOpen = false;
     const visualState = new WeakMap();
-    const visibleRange = 2.65;
+    const visibleRange = 3.35;
 
     function renderFilters() {
       filtersEl.innerHTML = categories.map(category => (
@@ -1003,23 +1004,17 @@
       });
     }
 
-    function loadImageElement(img) {
-      if (!img) return Promise.resolve();
-      if (!img.src) img.src = img.dataset.src;
+    function loadImageUrl(src) {
+      if (!src || /\.html($|[?#])/i.test(src)) return Promise.resolve();
       return new Promise(resolve => {
+        const img = new Image();
         let done = false;
         const finish = () => {
           if (done) return;
           done = true;
-          img.classList.add("is-loaded");
           resolve();
         };
-        const timer = setTimeout(finish, 1800);
-        if (img.complete && img.naturalWidth) {
-          clearTimeout(timer);
-          finish();
-          return;
-        }
+        const timer = setTimeout(finish, 12000);
         img.onload = () => {
           clearTimeout(timer);
           finish();
@@ -1028,15 +1023,52 @@
           clearTimeout(timer);
           finish();
         };
+        img.decoding = "async";
+        img.src = src;
       });
     }
 
-    async function preloadOpeningImages() {
-      const firstImages = cards.slice(0, Math.min(4, cards.length)).map(card => card.querySelector(".work-img"));
-      await Promise.race([
-        Promise.all(firstImages.map(loadImageElement)),
-        new Promise(resolve => setTimeout(resolve, 2200))
-      ]);
+    function collectImageUrls(items) {
+      const urls = new Set();
+      items.forEach(item => {
+        const sources = [
+          item.image,
+          item.beforeAfter && item.beforeAfter.before,
+          item.beforeAfter && item.beforeAfter.after,
+          ...(item.gallery || []),
+          ...(item.moreImages || [])
+        ];
+        sources
+          .filter(src => src && !/\.html($|[?#])/i.test(src))
+          .forEach(src => urls.add(src));
+      });
+      return Array.from(urls);
+    }
+
+    async function preloadAllImages() {
+      const urls = collectImageUrls(portfolioItems);
+      const total = urls.length || 1;
+      let loaded = 0;
+      let cursor = 0;
+      const concurrency = 4;
+      const updateText = () => {
+        if (loadingText) loadingText.textContent = `LOADING ${Math.round((loaded / total) * 100)}%`;
+      };
+      updateText();
+      async function worker() {
+        while (cursor < urls.length) {
+          const src = urls[cursor++];
+          await loadImageUrl(src);
+          loaded += 1;
+          updateText();
+        }
+      }
+      await Promise.all(Array.from({ length: Math.min(concurrency, urls.length) }, worker));
+      track.querySelectorAll(".work-img[data-src]").forEach(img => {
+        img.src = img.dataset.src;
+        if (img.complete) img.classList.add("is-loaded");
+        else img.onload = () => img.classList.add("is-loaded");
+      });
     }
 
     function finishLoading() {
@@ -1045,8 +1077,6 @@
       loadingScreen.classList.add("is-done");
       setTimeout(() => loadingScreen.remove(), 480);
     }
-
-    setTimeout(finishLoading, 3200);
 
     function measureStep() {
       if (!cards.length) return;
@@ -1077,11 +1107,11 @@
       else {
         if (!state.dragging && Math.abs(state.glideVelocity) > .0004) {
           state.target = clampIndex(state.target + state.glideVelocity);
-          state.glideVelocity *= .965;
+          state.glideVelocity *= .958;
         } else if (!state.dragging) {
           state.glideVelocity = 0;
         }
-        state.current += (state.target - state.current) * (state.dragging ? .62 : .13);
+        state.current += (state.target - state.current) * (state.dragging ? .74 : .2);
       }
 
       const offset = -state.current * state.cardStep;
@@ -1094,18 +1124,14 @@
         const distance = Math.abs(signed);
         const shadow = shadows[i];
         if (distance > visibleRange) {
-          card.style.visibility = "hidden";
           card.style.pointerEvents = "none";
           card.style.opacity = "0";
           if (shadow) {
-            shadow.style.visibility = "hidden";
             shadow.style.opacity = "0";
           }
           return;
         }
-        card.style.visibility = "visible";
         card.style.pointerEvents = "";
-        if (shadow) shadow.style.visibility = "visible";
 
         const depthFactor = Math.min(distance, 2.65);
         const scale = Math.max(.55, 1 - depthFactor * .16);
@@ -1120,7 +1146,7 @@
         const shine = 0;
         const targetVisual = { sidePush, lift, depth, rotateX, rotateY, rotateZ, scale, opacity, shade, shine };
         const previous = visualState.get(card) || targetVisual;
-        const ease = immediate ? 1 : .24;
+        const ease = immediate ? 1 : (state.dragging ? .72 : .36);
         const next = {};
         Object.keys(targetVisual).forEach(key => {
           next[key] = previous[key] + (targetVisual[key] - previous[key]) * ease;
@@ -1528,7 +1554,7 @@
       state.items = [...portfolioItems];
       renderFilters();
       renderCards();
-      await preloadOpeningImages();
+      await preloadAllImages();
       updateTransforms(true);
       finishLoading();
     }

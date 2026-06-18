@@ -509,16 +509,16 @@
       display: grid;
       gap: 18px;
       opacity: 0;
-      transform: translateY(72px) scale(.972);
-      transition: opacity .58s var(--ease), transform .66s var(--ease);
+      transform: none;
+      transition: opacity .34s ease;
     }
     .overlay.is-visible .detail-shell {
       opacity: 1;
-      transform: translateY(0) scale(1);
+      transform: none;
     }
     .overlay.is-closing .detail-shell {
       opacity: 0;
-      transform: translateY(72px) scale(.972);
+      transform: none;
     }
     .close {
       display: none;
@@ -559,15 +559,13 @@
       object-fit: contain;
       background: #222;
       opacity: 0;
-      transform: translateY(34px) scale(.965);
-      transition:
-        opacity .5s var(--ease),
-        transform .64s var(--ease);
+      transform: none;
+      transition: opacity .38s ease;
       box-shadow: 0 26px 70px rgba(0,0,0,.38);
-      transition-delay: calc(var(--order, 0) * 68ms + 120ms);
+      transition-delay: calc(var(--order, 0) * 42ms + 80ms);
     }
     .detail-image.is-title-image {
-      transform: translateY(-22px) scale(.975);
+      transform: none;
       transition-delay: 0ms;
       box-shadow:
         0 34px 86px rgba(0,0,0,.5),
@@ -575,11 +573,10 @@
     }
     .overlay.is-visible .detail-image {
       opacity: 1;
-      transform: translateY(0) scale(1);
+      transform: none;
     }
     .overlay.is-visible .detail-image:not(.is-title-image) {
-      animation: detailSettle .72s var(--ease) both;
-      animation-delay: calc(var(--order, 0) * 72ms + 160ms);
+      animation: none;
     }
     .detail-copy h2 {
       margin: 4px 0 12px;
@@ -1345,36 +1342,7 @@
     }
 
     function playZoomTransition(sourceCard, done) {
-      const sourceImg = sourceCard && sourceCard.querySelector(".work-img");
-      if (!sourceCard || !sourceImg) {
-        done();
-        return;
-      }
-
-      const rect = sourceImg.getBoundingClientRect();
-      const ghost = document.createElement("div");
-      const ghostImg = sourceImg.cloneNode(false);
-      ghostImg.src = sourceImg.currentSrc || sourceImg.src;
-      ghostImg.removeAttribute("loading");
-      ghost.className = "expand-ghost";
-      ghost.style.left = `${rect.left}px`;
-      ghost.style.top = `${rect.top}px`;
-      ghost.style.width = `${rect.width}px`;
-      ghost.style.height = `${rect.height}px`;
-      ghost.appendChild(ghostImg);
-      document.body.appendChild(ghost);
-
-      const targetScale = Math.min(1.1, Math.max(1.035, Math.min(window.innerWidth * .86 / rect.width, window.innerHeight * .72 / rect.height)));
-      requestAnimationFrame(() => {
-        const lift = Math.max(28, Math.min(58, rect.height * .12));
-        ghost.style.transform = `translate3d(0, -${lift}px, 0) scale(${targetScale})`;
-        ghost.style.opacity = "0";
-      });
-
-      window.setTimeout(() => {
-        ghost.remove();
-        done();
-      }, 230);
+      requestAnimationFrame(done);
     }
 
     function openDetail(item, sourceCard) {
@@ -1382,7 +1350,6 @@
       activeSourceCard = sourceCard || null;
       activeSourceIndex = sourceCard ? Number(sourceCard.dataset.index) : -1;
       if (sourceCard) {
-        sourceCard.classList.add("is-transition-source");
         showDetail(item, true);
         playZoomTransition(sourceCard, () => {
           overlay.classList.remove("is-opening");
@@ -1449,7 +1416,7 @@
         activeSourceCard = null;
         activeSourceIndex = -1;
         detailClosing = false;
-      }, 520);
+      }, 360);
     }
 
     function overlayPointerDown(event) {

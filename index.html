@@ -899,11 +899,13 @@
       startTarget: 0,
       velocity: 0,
       lastX: 0,
+      lastY: 0,
       lastTime: 0,
       startY: 0,
       moved: false,
       glideVelocity: 0,
-      cardStep: 1
+      cardStep: 1,
+      touchActive: false
     };
 
     const filtersEl = document.getElementById("filters");
@@ -1161,12 +1163,14 @@
     }
 
     function pointerDown(event) {
+      if (state.touchActive) return;
       if (event.cancelable) event.preventDefault();
       state.dragging = true;
       state.startX = event.clientX;
       state.startY = event.clientY;
       state.startTarget = state.target;
       state.lastX = event.clientX;
+      state.lastY = event.clientY;
       state.lastTime = performance.now();
       state.velocity = 0;
       state.glideVelocity = 0;
@@ -1178,6 +1182,7 @@
     }
 
     function pointerMove(event) {
+      if (state.touchActive) return;
       if (!state.dragging) return;
       if (event.cancelable) event.preventDefault();
       const dx = event.clientX - state.startX;
@@ -1188,11 +1193,13 @@
       state.velocity = -((event.clientX - state.lastX) / Math.max(8, now - state.lastTime)) * 19 / state.cardStep;
       motionCue.style.setProperty("--drag-pull", String(Math.max(-1, Math.min(1, dx / 86))));
       state.lastX = event.clientX;
+      state.lastY = event.clientY;
       state.lastTime = now;
       startAnimation();
     }
 
     function pointerUp(event) {
+      if (state.touchActive) return;
       if (!state.dragging) return;
       state.dragging = false;
       showroom.classList.remove("is-dragging");
@@ -1214,6 +1221,87 @@
       }
       state.target = clampIndex(state.current + state.velocity * .95);
       startFreeGlide(state.velocity);
+    }
+
+    function beginDragAt(x, y) {
+      state.dragging = true;
+      state.startX = x;
+      state.startY = y;
+      state.startTarget = state.target;
+      state.lastX = x;
+      state.lastY = y;
+      state.lastTime = performance.now();
+      state.velocity = 0;
+      state.glideVelocity = 0;
+      state.moved = false;
+      showroom.classList.add("is-dragging");
+      dragHint.classList.add("is-active");
+      motionCue.style.setProperty("--drag-pull", "0");
+      startAnimation();
+    }
+
+    function moveDragAt(x, y) {
+      if (!state.dragging) return;
+      const dx = x - state.startX;
+      const dy = y - state.startY;
+      const now = performance.now();
+      if (Math.hypot(dx, dy) > 8) state.moved = true;
+      state.target = clampIndex(state.startTarget - (dx * 1.18) / state.cardStep);
+      state.velocity = -((x - state.lastX) / Math.max(8, now - state.lastTime)) * 21 / state.cardStep;
+      motionCue.style.setProperty("--drag-pull", String(Math.max(-1, Math.min(1, dx / 86))));
+      state.lastX = x;
+      state.lastY = y;
+      state.lastTime = now;
+      startAnimation();
+    }
+
+    function endDragAt(x = state.lastX, y = state.lastY) {
+      if (!state.dragging) return;
+      state.dragging = false;
+      showroom.classList.remove("is-dragging");
+      dragHint.classList.remove("is-active");
+      motionCue.style.setProperty("--drag-pull", "0");
+      if (!state.moved) {
+        const target = document.elementFromPoint(x, y);
+        const card = target && target.closest && target.closest(".work-card");
+        if (card) {
+          const index = Number(card.dataset.index);
+          state.target = index;
+          state.index = index;
+          state.glideVelocity = 0;
+          state.moved = true;
+          openDetail(state.items[index], card);
+          return;
+        }
+      }
+      const totalDx = x - state.startX;
+      const fallbackVelocity = totalDx ? -(totalDx * .06) / state.cardStep : 0;
+      const releaseVelocity = Math.abs(state.velocity) > .018 ? state.velocity : fallbackVelocity;
+      state.target = clampIndex(state.current + releaseVelocity * 1.05);
+      startFreeGlide(releaseVelocity);
+    }
+
+    function touchStart(event) {
+      if (event.touches.length !== 1 || overlay.classList.contains("is-open")) return;
+      event.preventDefault();
+      state.touchActive = true;
+      const touch = event.touches[0];
+      beginDragAt(touch.clientX, touch.clientY);
+    }
+
+    function touchMove(event) {
+      if (!state.touchActive || !event.touches.length) return;
+      event.preventDefault();
+      const touch = event.touches[0];
+      moveDragAt(touch.clientX, touch.clientY);
+    }
+
+    function touchEnd(event) {
+      if (!state.touchActive) return;
+      event.preventDefault();
+      const touch = event.changedTouches && event.changedTouches[0];
+      endDragAt(touch ? touch.clientX : state.lastX, touch ? touch.clientY : state.lastY);
+      setTimeout(() => { state.touchActive = false; }, 80);
     }
 
     function wheelMove(event) {
@@ -1406,6 +1494,10 @@
     showroom.addEventListener("pointermove", pointerMove);
     showroom.addEventListener("pointerup", pointerUp);
     showroom.addEventListener("pointercancel", pointerUp);
+    showroom.addEventListener("touchstart", touchStart, { passive: false });
+    showroom.addEventListener("touchmove", touchMove, { passive: false });
+    showroom.addEventListener("touchend", touchEnd, { passive: false });
+    showroom.addEventListener("touchcancel", touchEnd, { passive: false });
     showroom.addEventListener("wheel", wheelMove, { passive: true });
     closeBtn.addEventListener("click", closeDetail);
     overlay.addEventListener("pointerdown", overlayPointerDown);

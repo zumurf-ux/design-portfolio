@@ -30,51 +30,12 @@
       letter-spacing: 0;
       -webkit-font-smoothing: antialiased;
     }
-    body.is-loading .app,
-    body.is-loading .overlay {
-      visibility: hidden;
-    }
     button { font: inherit; color: inherit; }
     img { display: block; max-width: 100%; }
-    .loading-screen {
-      position: fixed;
-      inset: 0;
-      z-index: 999;
-      display: grid;
-      place-items: center;
-      background: #f5f5f5;
-      color: rgba(17,17,17,.72);
-      transition: opacity .38s var(--ease), visibility .38s var(--ease);
-    }
-    .loading-screen.is-done {
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-    }
-    .loading-mark {
-      display: grid;
-      justify-items: center;
-      gap: 18px;
-      transform: translateY(-8px);
-    }
-    .loading-logo {
-      width: clamp(132px, 38vw, 190px);
-      height: auto;
-      object-fit: contain;
-      opacity: .92;
-    }
-    .loading-text {
-      font-size: 11px;
-      letter-spacing: .08em;
-      color: rgba(17,17,17,.5);
-    }
     .app {
       position: relative;
       min-height: 100svh;
-      background:
-        linear-gradient(rgba(255,255,255,.18), rgba(255,255,255,.08)),
-        url("images/perspective-bg.svg") center center / cover no-repeat fixed,
-        #f5f5f5;
+      background: var(--bg);
       isolation: isolate;
       overflow: visible;
     }
@@ -149,8 +110,8 @@
     .hero {
       position: relative;
       min-height: 100svh;
-      padding: 108px 0 112px;
-      overflow: hidden;
+      padding: 82px 0 112px;
+      overflow: visible;
     }
     .drag-hint {
       position: fixed;
@@ -210,39 +171,28 @@
     }
 
     .showroom {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      perspective: 760px;
-      perspective-origin: 50% 46%;
-      touch-action: none;
-      cursor: grab;
+      position: relative;
+      inset: auto;
+      display: block;
+      max-width: 980px;
+      margin: 0 auto;
+      perspective: none;
+      touch-action: pan-y;
+      cursor: default;
       user-select: none;
     }
-    .showroom.is-dragging { cursor: grabbing; }
+    .showroom.is-dragging { cursor: default; }
     .track {
-      display: flex;
-      align-items: center;
-      gap: var(--card-gap);
-      padding: 0 calc((100vw - var(--card-w)) / 2);
-      will-change: transform;
-      transform: translate3d(0,0,0);
-      transform-style: preserve-3d;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: start;
+      gap: 12px;
+      padding: 20px 14px 96px;
+      will-change: auto;
+      transform: none;
+      transform-style: flat;
     }
-    .shadow-track {
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: 75%;
-      display: flex;
-      align-items: center;
-      gap: var(--card-gap);
-      padding: 0 calc((100vw - var(--card-w)) / 2);
-      pointer-events: none;
-      will-change: transform;
-      z-index: 0;
-    }
+    .shadow-track { display: none; }
     .gallery-shadow {
       width: var(--card-w);
       height: 28px;
@@ -256,22 +206,21 @@
     }
     .work-card {
       position: relative;
-      width: var(--card-w);
-      height: clamp(260px, 46svh, 430px);
-      flex: 0 0 auto;
+      width: 100%;
+      aspect-ratio: 1 / 1;
       border: 0;
       border-radius: 8px;
-      overflow: visible;
+      overflow: hidden;
       background: #1a1a1a;
       box-shadow: none;
       transform-origin: center;
-      will-change: transform, opacity;
+      will-change: auto;
       cursor: pointer;
-      transition: box-shadow .28s var(--ease);
-      transform-style: preserve-3d;
+      transition: opacity .2s ease;
+      transform-style: flat;
       display: grid;
       place-items: center;
-      contain: layout style;
+      contain: layout paint style;
     }
     .work-card.is-transition-source {
       opacity: 0 !important;
@@ -302,7 +251,7 @@
       overflow: hidden;
       border-radius: 8px;
       background: #1a1a1a;
-      transform: translateZ(0);
+      transform: none;
       backface-visibility: hidden;
       -webkit-mask-image: -webkit-radial-gradient(white, black);
     }
@@ -330,7 +279,7 @@
     }
     .work-img.is-loaded { opacity: 1; }
     .work-card.is-html .work-meta {
-      display: block;
+      display: none;
     }
     .work-card.is-html::after {
       content: none;
@@ -341,26 +290,19 @@
         linear-gradient(180deg, transparent 68%, rgba(0,0,0,.16) 100%);
     }
     .work-meta {
-      position: absolute;
-      left: 0;
-      right: auto;
-      top: -30px;
-      z-index: 4;
-      max-width: 100%;
-      opacity: .72;
-      pointer-events: none;
-      transform: translateZ(24px);
+      display: none;
     }
     .work-title {
       margin: 0;
-      font-size: clamp(14px, 3.7vw, 18px);
+      font-size: clamp(13px, 3.6vw, 16px);
       line-height: 1.1;
       font-weight: 500;
       overflow-wrap: anywhere;
       color: #050505;
-      text-shadow: none;
+      text-shadow: 0 1px 10px rgba(255,255,255,.8);
       letter-spacing: 0;
     }
+    .drag-hint, .progress { display: none; }
     .progress {
       position: fixed;
       left: 18px;
@@ -462,10 +404,7 @@
       inset: 0;
       z-index: 100;
       display: none;
-      background:
-        linear-gradient(rgba(255,255,255,.18), rgba(255,255,255,.08)),
-        url("images/perspective-bg.svg") center center / cover no-repeat fixed,
-        #f5f5f5;
+      background: var(--bg);
       opacity: 0;
       transition: opacity .34s var(--ease);
     }
@@ -657,7 +596,8 @@
     }
     @media (min-width: 760px) {
       :root { --card-w: min(44vw, 360px); --card-gap: 44px; }
-      .hero { padding-top: 108px; }
+      .hero { padding-top: 96px; }
+      .track { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; padding-left: 22px; padding-right: 22px; }
       .detail-shell { grid-template-columns: minmax(280px, 390px) 1fr; align-items: start; }
       .close { grid-column: 1 / -1; }
       .detail-gallery, .ba-wrap { width: 100%; }
@@ -666,7 +606,7 @@
 
     @media (orientation: landscape) and (max-height: 560px) {
       :root { --card-w: min(31vw, 260px); }
-      .hero { padding: 82px 0 76px; }
+      .hero { padding: 76px 0 76px; }
       .drag-hint { bottom: calc(86px + env(safe-area-inset-bottom)); }
     }
 
@@ -675,13 +615,7 @@
     }
   </style>
 </head>
-<body class="is-loading">
-  <div class="loading-screen" id="loadingScreen" role="status" aria-live="polite">
-    <div class="loading-mark">
-      <img class="loading-logo" src="images/type-logo.png" alt="TheDesignUncle">
-      <div class="loading-text" id="loadingText">LOADING</div>
-    </div>
-  </div>
+<body>
   <script src="gallery-data.js"></script>
   <script>
     const STORAGE_KEY = "uncleDesignPortfolioItems";
@@ -898,9 +832,6 @@
     const detailTitle = document.getElementById("detailTitle");
     const detailDesc = document.getElementById("detailDesc");
     const detailSpecs = document.getElementById("detailSpecs");
-    const loadingScreen = document.getElementById("loadingScreen");
-    const loadingText = document.getElementById("loadingText");
-
     let cards = [];
     let shadows = [];
     let lazyObserver;
@@ -912,6 +843,7 @@
     let detailHistoryOpen = false;
     const visualState = new WeakMap();
     const visibleRange = 3.35;
+    const gridMode = true;
 
     function renderFilters() {
       filtersEl.innerHTML = categories.map(category => (
@@ -929,9 +861,6 @@
       track.innerHTML = state.items.map((item, index) => `
         <article class="work-card ${isHtmlMedia(item, item.html || item.image || "") ? "is-html" : ""}" data-index="${index}">
           <div class="work-frame">${renderCardMedia(item)}</div>
-          <div class="work-meta">
-            <h2 class="work-title">${item.title}</h2>
-          </div>
         </article>
       `).join("");
       shadowTrack.innerHTML = state.items.map(() => `<span class="gallery-shadow"></span>`).join("");
@@ -1051,23 +980,7 @@
       await Promise.all(Array.from({ length: Math.min(concurrency, urls.length) }, worker));
     }
 
-    async function preloadMainImages() {
-      const urls = collectMainImageUrls(portfolioItems);
-      await preloadUrls(urls, percent => {
-        if (loadingText) loadingText.textContent = `LOADING ${percent}%`;
-      }, 5);
-      track.querySelectorAll(".work-img[data-src]").forEach(img => {
-        img.src = img.dataset.src;
-        if (img.complete) img.classList.add("is-loaded");
-        else img.onload = () => img.classList.add("is-loaded");
-      });
-    }
-
     function finishLoading() {
-      document.body.classList.remove("is-loading");
-      if (!loadingScreen) return;
-      loadingScreen.classList.add("is-done");
-      setTimeout(() => loadingScreen.remove(), 480);
       if (cards.length) startAnimation();
     }
 
@@ -1089,6 +1002,7 @@
     }
 
     function startAnimation() {
+      if (gridMode) return;
       if (!animationStarted) {
         animationStarted = true;
         requestAnimationFrame(animate);
@@ -1096,6 +1010,22 @@
     }
 
     function updateTransforms(immediate = false) {
+      if (gridMode) {
+        track.style.transform = "none";
+        shadowTrack.style.transform = "none";
+        cards.forEach((card, index) => {
+          card.style.transform = "none";
+          card.style.opacity = "1";
+          card.style.pointerEvents = "";
+          card.style.zIndex = "";
+          card.style.setProperty("--shade", "0");
+          const shadow = shadows[index];
+          if (shadow) shadow.style.opacity = "0";
+        });
+        countText.textContent = `${String(state.items.length).padStart(2, "0")} / ${String(state.items.length).padStart(2, "0")}`;
+        progressBar.style.transform = "scaleX(1)";
+        return;
+      }
       const floatTime = performance.now() * .001;
       if (immediate) state.current = state.target;
       else {
@@ -1174,6 +1104,10 @@
     }
 
     function animate() {
+      if (gridMode) {
+        animationStarted = false;
+        return;
+      }
       updateTransforms(false);
       const stillMoving = state.dragging || Math.abs(state.glideVelocity) > .0004 || Math.abs(state.target - state.current) > .001;
       if (stillMoving || !overlay.classList.contains("is-open")) {
@@ -1184,6 +1118,7 @@
     }
 
     function pointerDown(event) {
+      if (gridMode) return;
       if (state.touchActive) return;
       if (event.cancelable) event.preventDefault();
       state.dragging = true;
@@ -1203,6 +1138,7 @@
     }
 
     function pointerMove(event) {
+      if (gridMode) return;
       if (state.touchActive) return;
       if (!state.dragging) return;
       if (event.cancelable) event.preventDefault();
@@ -1220,6 +1156,7 @@
     }
 
     function pointerUp(event) {
+      if (gridMode) return;
       if (state.touchActive) return;
       if (!state.dragging) return;
       state.dragging = false;
@@ -1303,6 +1240,7 @@
     }
 
     function touchStart(event) {
+      if (gridMode) return;
       if (event.touches.length !== 1 || overlay.classList.contains("is-open")) return;
       event.preventDefault();
       state.touchActive = true;
@@ -1311,6 +1249,7 @@
     }
 
     function touchMove(event) {
+      if (gridMode) return;
       if (!state.touchActive || !event.touches.length) return;
       event.preventDefault();
       const touch = event.touches[0];
@@ -1318,6 +1257,7 @@
     }
 
     function touchEnd(event) {
+      if (gridMode) return;
       if (!state.touchActive) return;
       event.preventDefault();
       const touch = event.changedTouches && event.changedTouches[0];
@@ -1326,6 +1266,7 @@
     }
 
     function wheelMove(event) {
+      if (gridMode) return;
       state.glideVelocity = 0;
       if (Math.abs(event.deltaX) < Math.abs(event.deltaY)) {
         state.target = clampIndex(state.target + event.deltaY / 420);
@@ -1519,7 +1460,6 @@
       state.items = [...portfolioItems];
       renderFilters();
       renderCards();
-      await preloadMainImages();
       updateTransforms(true);
       finishLoading();
     }

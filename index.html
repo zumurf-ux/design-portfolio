@@ -57,10 +57,30 @@
       gap: 18px;
       transform: translateY(-8px);
     }
+    .loading-logo-wrap {
+      position: relative;
+      width: clamp(148px, 44vw, 232px);
+      height: clamp(17px, 4.9vw, 26px);
+      overflow: hidden;
+    }
+    .loading-logo-wrap::after {
+      content: "";
+      position: absolute;
+      top: -10%;
+      left: 0;
+      width: 2px;
+      height: 120%;
+      border-radius: 999px;
+      background: rgba(5,5,5,.58);
+      animation: logoCursor 2.8s steps(22, end) infinite;
+    }
     .loading-logo {
-      width: clamp(132px, 38vw, 190px);
-      height: auto;
-      opacity: .92;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      opacity: .94;
+      clip-path: inset(0 100% 0 0);
+      animation: logoType 2.8s steps(22, end) infinite;
     }
     .loading-line {
       width: 112px;
@@ -87,6 +107,15 @@
       0% { transform: translateX(-130%); opacity: .35; }
       45% { opacity: .72; }
       100% { transform: translateX(255%); opacity: .35; }
+    }
+    @keyframes logoType {
+      0%, 10% { clip-path: inset(0 100% 0 0); }
+      68%, 100% { clip-path: inset(0 0 0 0); }
+    }
+    @keyframes logoCursor {
+      0%, 10% { transform: translateX(0); opacity: .3; }
+      68% { transform: translateX(clamp(148px, 44vw, 232px)); opacity: .75; }
+      82%, 100% { transform: translateX(clamp(148px, 44vw, 232px)); opacity: 0; }
     }
     .app {
       position: relative;
@@ -701,7 +730,9 @@
 <body class="is-loading">
   <div class="loading-screen" id="loadingScreen" role="status" aria-live="polite">
     <div class="loading-mark">
-      <img class="loading-logo" src="images/type-logo.png" alt="TheDesignUncle">
+      <div class="loading-logo-wrap" aria-hidden="true">
+        <img class="loading-logo" src="images/type-logo.png" alt="">
+      </div>
       <div class="loading-line" aria-hidden="true"></div>
       <div class="loading-text" id="loadingText">LOADING</div>
     </div>

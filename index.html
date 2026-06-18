@@ -76,7 +76,7 @@
       height: 100%;
       border-radius: inherit;
       background: rgba(17,17,17,.5);
-      animation: loadingMove 1.05s ease-in-out infinite;
+      animation: loadingMove 2.4s cubic-bezier(.45, 0, .2, 1) infinite;
     }
     .loading-text {
       font-size: 11px;
@@ -84,8 +84,9 @@
       color: rgba(17,17,17,.5);
     }
     @keyframes loadingMove {
-      0% { transform: translateX(-120%); }
-      100% { transform: translateX(250%); }
+      0% { transform: translateX(-130%); opacity: .35; }
+      45% { opacity: .72; }
+      100% { transform: translateX(255%); opacity: .35; }
     }
     .app {
       position: relative;
@@ -280,7 +281,7 @@
       flex: 0 0 auto;
       border: 0;
       border-radius: 8px;
-      overflow: hidden;
+      overflow: visible;
       background: #1a1a1a;
       box-shadow: none;
       transform-origin: center;
@@ -290,7 +291,7 @@
       transform-style: preserve-3d;
       display: grid;
       place-items: center;
-      contain: layout paint style;
+      contain: layout style;
     }
     .work-card.is-transition-source {
       opacity: 0 !important;
@@ -333,7 +334,7 @@
     }
     .work-img.is-loaded { opacity: 1; }
     .work-card.is-html .work-meta {
-      display: none;
+      display: block;
     }
     .work-card.is-html::after {
       background:
@@ -342,20 +343,21 @@
     }
     .work-meta {
       position: absolute;
-      left: 14px;
-      right: 14px;
-      bottom: 13px;
-      z-index: 2;
+      left: 0;
+      right: 0;
+      top: -32px;
+      z-index: 4;
       opacity: .72;
+      pointer-events: none;
     }
     .work-title {
-      margin: 0 0 6px;
-      font-size: clamp(17px, 4.8vw, 22px);
+      margin: 0;
+      font-size: clamp(15px, 4vw, 19px);
       line-height: 1.12;
       font-weight: 500;
       overflow-wrap: anywhere;
-      color: rgba(255,255,255,.78);
-      text-shadow: 0 8px 22px rgba(0,0,0,.55);
+      color: #050505;
+      text-shadow: none;
     }
     .progress {
       position: fixed;
@@ -1033,7 +1035,7 @@
     }
 
     function startFreeGlide(extraVelocity = 0) {
-      state.glideVelocity = Math.max(-.62, Math.min(.62, extraVelocity * 2.55));
+      state.glideVelocity = Math.max(-1.18, Math.min(1.18, extraVelocity * 4.2));
       dragHint.classList.add("is-quiet");
       startAnimation();
     }
@@ -1050,11 +1052,11 @@
       else {
         if (!state.dragging && Math.abs(state.glideVelocity) > .0004) {
           state.target = clampIndex(state.target + state.glideVelocity);
-          state.glideVelocity *= .955;
+          state.glideVelocity *= .975;
         } else if (!state.dragging) {
           state.glideVelocity = 0;
         }
-        state.current += (state.target - state.current) * (state.dragging ? .5 : .24);
+        state.current += (state.target - state.current) * (state.dragging ? .68 : .18);
       }
 
       const offset = -state.current * state.cardStep;
@@ -1159,8 +1161,8 @@
       const dy = event.clientY - state.startY;
       const now = performance.now();
       if (Math.hypot(dx, dy) > 8) state.moved = true;
-      state.target = clampIndex(state.startTarget - (dx * 1.42) / state.cardStep);
-      state.velocity = -((event.clientX - state.lastX) / Math.max(8, now - state.lastTime)) * 23 / state.cardStep;
+      state.target = clampIndex(state.startTarget - (dx * 2.05) / state.cardStep);
+      state.velocity = -((event.clientX - state.lastX) / Math.max(8, now - state.lastTime)) * 34 / state.cardStep;
       motionCue.style.setProperty("--drag-pull", String(Math.max(-1, Math.min(1, dx / 86))));
       state.lastX = event.clientX;
       state.lastTime = now;
@@ -1187,7 +1189,7 @@
           return;
         }
       }
-      state.target = clampIndex(state.current + state.velocity * 1.12);
+      state.target = clampIndex(state.current + state.velocity * 2.1);
       startFreeGlide(state.velocity);
     }
 

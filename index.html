@@ -57,30 +57,11 @@
       gap: 18px;
       transform: translateY(-8px);
     }
-    .loading-logo-wrap {
-      position: relative;
-      width: clamp(148px, 44vw, 232px);
-      height: clamp(17px, 4.9vw, 26px);
-      overflow: hidden;
-    }
-    .loading-logo-wrap::after {
-      content: "";
-      position: absolute;
-      top: -10%;
-      left: 0;
-      width: 2px;
-      height: 120%;
-      border-radius: 999px;
-      background: rgba(5,5,5,.58);
-      animation: logoCursor 2.8s steps(22, end) infinite;
-    }
     .loading-logo {
-      width: 100%;
-      height: 100%;
+      width: clamp(132px, 38vw, 190px);
+      height: auto;
       object-fit: contain;
-      opacity: .94;
-      clip-path: inset(0 100% 0 0);
-      animation: logoType 2.8s steps(22, end) infinite;
+      opacity: .92;
     }
     .loading-line {
       width: 112px;
@@ -107,15 +88,6 @@
       0% { transform: translateX(-130%); opacity: .35; }
       45% { opacity: .72; }
       100% { transform: translateX(255%); opacity: .35; }
-    }
-    @keyframes logoType {
-      0%, 10% { clip-path: inset(0 100% 0 0); }
-      68%, 100% { clip-path: inset(0 0 0 0); }
-    }
-    @keyframes logoCursor {
-      0%, 10% { transform: translateX(0); opacity: .3; }
-      68% { transform: translateX(clamp(148px, 44vw, 232px)); opacity: .75; }
-      82%, 100% { transform: translateX(clamp(148px, 44vw, 232px)); opacity: 0; }
     }
     .app {
       position: relative;
@@ -528,14 +500,14 @@
       background: transparent;
       pointer-events: none;
       box-shadow:
-        0 42px 110px rgba(0,0,0,.62),
-        0 18px 48px rgba(0,0,0,.46);
+        0 30px 76px rgba(0,0,0,.28),
+        0 12px 32px rgba(0,0,0,.2);
       transform-origin: center center;
       will-change: transform, opacity, border-radius;
       transition:
-        transform .36s cubic-bezier(.18, 1, .28, 1),
-        opacity .08s linear,
-        border-radius .36s cubic-bezier(.18, 1, .28, 1);
+        transform .34s cubic-bezier(.22, 1, .36, 1),
+        opacity .18s ease,
+        border-radius .34s cubic-bezier(.22, 1, .36, 1);
     }
     .expand-ghost img {
       width: 100%;
@@ -730,9 +702,7 @@
 <body class="is-loading">
   <div class="loading-screen" id="loadingScreen" role="status" aria-live="polite">
     <div class="loading-mark">
-      <div class="loading-logo-wrap" aria-hidden="true">
-        <img class="loading-logo" src="images/type-logo.png" alt="">
-      </div>
+      <img class="loading-logo" src="images/type-logo.png" alt="TheDesignUncle">
       <div class="loading-line" aria-hidden="true"></div>
       <div class="loading-text" id="loadingText">LOADING</div>
     </div>

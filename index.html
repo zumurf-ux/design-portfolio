@@ -1,10 +1,10 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="ko">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#f5f5f5">
-  <title>디자인하는삼촌 | 모바일 포트폴리오 쇼룸</title>
+  <title>?붿옄?명븯?붿궪珥?| 紐⑤컮???ы듃?대━???쇰８</title>
   <style>
     :root {
       color-scheme: light;
@@ -38,12 +38,14 @@
       background: var(--bg);
       isolation: isolate;
       overflow: visible;
+      transition: filter .32s ease, opacity .32s ease;
+      will-change: filter;
     }
 
     .topbar {
       position: fixed;
       inset: max(14px, env(safe-area-inset-top)) 0 auto 0;
-      z-index: 50;
+      z-index: 160;
       padding: 0 16px;
       pointer-events: none;
     }
@@ -60,6 +62,11 @@
       height: auto;
       object-fit: contain;
       display: block;
+      transition: filter .28s ease, opacity .28s ease;
+      will-change: filter;
+    }
+    .brand-logo.is-light {
+      filter: brightness(0) invert(1) drop-shadow(0 1px 8px rgba(0,0,0,.24));
     }
     .count {
       font-size: 12px;
@@ -282,6 +289,11 @@
     body.is-detail-open .work-img {
       transition: none !important;
     }
+    body.is-detail-open .hero {
+      filter: blur(8px);
+      transform: translateZ(0);
+      pointer-events: none;
+    }
     .work-card.is-html .work-meta {
       display: none;
     }
@@ -331,7 +343,7 @@
       left: 12px;
       right: 12px;
       bottom: calc(10px + env(safe-area-inset-bottom));
-      z-index: 70;
+      z-index: 160;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 8px;
@@ -443,7 +455,7 @@
       scrollbar-width: none;
       -ms-overflow-style: none;
       touch-action: pan-y;
-      padding: max(12px, env(safe-area-inset-top)) 16px calc(28px + env(safe-area-inset-bottom));
+      padding: max(12px, env(safe-area-inset-top)) 0 calc(28px + env(safe-area-inset-bottom));
     }
     .detail::-webkit-scrollbar { display: none; }
     .detail-shell {
@@ -451,9 +463,15 @@
       margin: 0 auto;
       display: grid;
       gap: 18px;
+      justify-items: center;
       opacity: 0;
       transform: none;
       transition: opacity .34s ease;
+    }
+    #detailMedia {
+      width: 100%;
+      display: grid;
+      justify-items: center;
     }
     .overlay.is-visible .detail-shell {
       opacity: 1;
@@ -477,15 +495,16 @@
       cursor: pointer;
     }
     .detail-gallery {
-      width: min(78vw, 390px);
+      width: min(calc(100vw - 32px), 390px);
       justify-self: center;
       display: grid;
       gap: 12px;
       align-content: start;
+      justify-items: center;
     }
     .overlay.is-html-detail .detail-gallery,
     .overlay.is-image-detail .detail-gallery {
-      width: min(94vw, 560px);
+      width: min(calc(100vw - 32px), 560px);
     }
     .overlay.is-html-detail .detail-shell,
     .overlay.is-image-detail .detail-shell {
@@ -574,7 +593,7 @@
       pointer-events: none;
     }
     .ba-line::after {
-      content: "↔";
+      content: "??;
       position: absolute;
       top: 50%;
       left: 50%;
@@ -604,7 +623,17 @@
       .track { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; padding-left: 22px; padding-right: 22px; }
       .detail-shell { grid-template-columns: minmax(280px, 390px) 1fr; align-items: start; }
       .close { grid-column: 1 / -1; }
-      .detail-gallery, .ba-wrap { width: 100%; }
+      .ba-wrap { width: 100%; }
+      .overlay.is-html-detail .detail-shell,
+      .overlay.is-image-detail .detail-shell {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        max-width: min(calc(100vw - 32px), 560px);
+      }
+      .overlay.is-html-detail .detail-gallery,
+      .overlay.is-image-detail .detail-gallery {
+        width: min(calc(100vw - 32px), 560px);
+      }
       .detail-copy { padding-top: 8px; }
     }
 
@@ -627,147 +656,36 @@
     const DB_STORE = "portfolio";
     const DB_ITEMS_KEY = "items";
     const htmlPortfolioItems = Array.isArray(window.htmlGalleryItems) ? window.htmlGalleryItems : [];
-    const defaultPortfolioItems = htmlPortfolioItems.length ? htmlPortfolioItems : [
-      {
-        title: "양평두물머리해장국",
-        category: "메뉴판",
-        industry: "한식당",
-        field: "메뉴판 디자인",
-        image: "images/work1.svg",
-        gallery: ["images/work1.svg", "images/work2.svg", "images/work3.svg"],
-        description: "대표 메뉴가 빠르게 읽히도록 가격, 사진, 주문 흐름을 정리한 식당 메뉴판입니다.",
-        tools: "Photoshop, Illustrator",
-        year: "2026"
-      },
-      {
-        title: "삼촌국수",
-        category: "간판",
-        industry: "분식점",
-        field: "외부 간판",
-        image: "images/work2.svg",
-        gallery: ["images/work2.svg", "images/before.svg", "images/after.svg"],
-        description: "멀리서도 상호가 먼저 들어오도록 글자 대비와 야간 시인성을 중심으로 설계했습니다.",
-        tools: "Illustrator",
-        year: "2026",
-        beforeAfter: {
-          before: "images/before.svg",
-          after: "images/after.svg"
-        }
-      },
-      {
-        title: "카페 오후",
-        category: "배너",
-        industry: "카페",
-        field: "시즌 배너",
-        image: "images/work3.svg",
-        gallery: ["images/work3.svg"],
-        description: "신메뉴를 가까이서 보고 싶게 만드는 촬영형 구도와 짧은 카피를 사용했습니다.",
-        tools: "Photoshop",
-        year: "2025"
-      },
-      {
-        title: "정담반찬",
-        category: "전단지",
-        industry: "반찬가게",
-        field: "오픈 전단",
-        image: "images/work4.svg",
-        gallery: ["images/work4.svg"],
-        description: "첫 방문 혜택과 위치 정보를 한눈에 확인할 수 있게 구성한 오픈 홍보물입니다.",
-        tools: "Illustrator, Photoshop",
-        year: "2025"
-      },
-      {
-        title: "소담마켓",
-        category: "상세페이지",
-        industry: "온라인 판매",
-        field: "상품 상세페이지",
-        image: "images/work5.svg",
-        gallery: ["images/work5.svg"],
-        description: "상품의 장점, 사용 장면, 구매 이유가 자연스럽게 이어지도록 만든 상세페이지입니다.",
-        tools: "Figma, Photoshop",
-        year: "2026"
-      },
-      {
-        title: "로스터리 결",
-        category: "로고",
-        industry: "커피 브랜드",
-        field: "브랜드 로고",
-        image: "images/work6.svg",
-        gallery: ["images/work6.svg"],
-        description: "작은 컵, 스티커, 간판까지 선명하게 보이는 심플한 로고 시스템입니다.",
-        tools: "Illustrator",
-        year: "2025"
-      }
-    ];
-
-    function openPortfolioDB() {
-      return new Promise((resolve, reject) => {
-        if (!("indexedDB" in window)) {
-          reject(new Error("IndexedDB unavailable"));
-          return;
-        }
-        const request = indexedDB.open(DB_NAME, 1);
-        request.onupgradeneeded = () => request.result.createObjectStore(DB_STORE);
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-      });
-    }
-
-    async function readPortfolioFromDB() {
-      const db = await openPortfolioDB();
-      return new Promise((resolve, reject) => {
-        const tx = db.transaction(DB_STORE, "readonly");
-        const request = tx.objectStore(DB_STORE).get(DB_ITEMS_KEY);
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-      });
-    }
-
-    async function loadPortfolioItems() {
-      try {
-        const saved = await readPortfolioFromDB();
-        if (Array.isArray(saved) && saved.length && !shouldPreferHtmlDefaults(saved)) return saved;
-      } catch (error) {}
-      try {
-        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
-        return Array.isArray(saved) && saved.length && !shouldPreferHtmlDefaults(saved) ? saved : defaultPortfolioItems;
-      } catch (error) {
-        return defaultPortfolioItems;
-      }
-    }
-
-    function shouldPreferHtmlDefaults(saved) {
-      return htmlPortfolioItems.length && (
-        saved.some(item => /^images\/work/i.test(item.image || "")) ||
-        saved.some(item => item.type === "html")
-      );
-    }
-
+    const defaultPortfolioItems = htmlPortfolioItems.length ? htmlPortfolioItems : [];
     let portfolioItems = defaultPortfolioItems;
   </script>
 
-  <main class="app">
-    <header class="topbar" aria-label="상단">
+  <header class="topbar" aria-label="상단">
       <div class="brand-row">
         <img class="brand-logo" src="images/type-logo.png" alt="TheDesignUncle">
       </div>
     </header>
 
-    <nav class="filters" id="filters" aria-label="작품 카테고리"></nav>
+  <main class="app">
 
-    <section class="hero" aria-label="포트폴리오 쇼룸">
+    <nav class="filters" id="filters" aria-label="?묓뭹 移댄뀒怨좊━"></nav>
+
+    <section class="hero" aria-label="?ы듃?대━???쇰８">
       <div class="showroom" id="showroom">
         <div class="shadow-track" id="shadowTrack" aria-hidden="true"></div>
         <div class="track" id="track"></div>
       </div>
-      <div class="drag-hint" id="dragHint" aria-label="현재 작품 위치">
+      <div class="drag-hint" id="dragHint" aria-label="?꾩옱 ?묓뭹 ?꾩튂">
         <div class="count count-bottom" id="countText">01 / 06</div>
         <div class="motion-cue" id="motionCue" aria-hidden="true"><span></span><span></span><span></span></div>
       </div>
       <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
     </section>
 
-    <div class="contact-bar" aria-label="문의하기">
+    
+  </main>
+
+  <div class="contact-bar" aria-label="臾몄쓽?섍린">
       <a href="tel:010-0000-0000">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 3.8 9 3.2l2.1 4.7-1.4 1.1c1 2 2.5 3.5 4.4 4.5l1.2-1.4 4.7 2.1-.7 2.5c-.3 1.1-1.3 1.8-2.4 1.7C10.4 18 5.2 12.8 4.8 6.2c-.1-1.1.7-2.1 1.8-2.4Z"/></svg>
         <span>PHONE</span>
@@ -780,14 +698,13 @@
         <svg class="kakao-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.3c5 0 9 3 9 6.7s-4 6.7-9 6.7c-.8 0-1.6-.1-2.4-.3L5.7 20l1-3.7C4.4 15.1 3 13.2 3 11c0-3.7 4-6.7 9-6.7Z"/><text x="12" y="14.4" text-anchor="middle">K</text></svg>
         <span>KAKAOTALK</span>
       </a>
-      <div class="copyright">© 2026 디자인하는삼촌. All rights reserved.</div>
+      <div class="copyright">짤 2026 ?붿옄?명븯?붿궪珥? All rights reserved.</div>
     </div>
-  </main>
 
   <aside class="overlay" id="overlay" aria-hidden="true">
     <div class="detail">
       <div class="detail-shell">
-        <button class="close" id="closeBtn" aria-label="닫기">×</button>
+        <button class="close" id="closeBtn" aria-label="?リ린">횞</button>
         <div id="detailMedia"></div>
         <div class="detail-copy">
           <h2 id="detailTitle"></h2>
@@ -799,11 +716,11 @@
   </aside>
 
   <script>
-    const baseCategories = ["전체"];
-    const hiddenCategoryLabels = new Set(["포트폴리오", "이미지 갤러리", "HTML"]);
+    const baseCategories = ["?꾩껜"];
+    const hiddenCategoryLabels = new Set(["HTML"]);
     let categories = [...baseCategories];
     const state = {
-      filter: "전체",
+      filter: "?꾩껜",
       items: [...portfolioItems],
       index: 0,
       target: 0,
@@ -836,6 +753,7 @@
     const detailTitle = document.getElementById("detailTitle");
     const detailDesc = document.getElementById("detailDesc");
     const detailSpecs = document.getElementById("detailSpecs");
+    const brandLogo = document.querySelector(".brand-logo");
     let cards = [];
     let shadows = [];
     let lazyObserver;
@@ -846,6 +764,9 @@
     let overlayTap = null;
     let detailHistoryOpen = false;
     let lockedScrollY = 0;
+    let logoToneTicking = false;
+    const logoToneCanvas = document.createElement("canvas");
+    const logoToneCtx = logoToneCanvas.getContext("2d", { willReadFrequently: true });
     const visualState = new WeakMap();
     const visibleRange = 3.35;
     const gridMode = true;
@@ -859,6 +780,56 @@
       document.body.classList.remove("is-detail-open");
     }
 
+    function sampleImageLuminance(img, x, y) {
+      if (!img || !img.complete || !img.naturalWidth || !logoToneCtx) return null;
+      const rect = img.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      const scale = Math.max(rect.width / img.naturalWidth, rect.height / img.naturalHeight);
+      const renderedW = img.naturalWidth * scale;
+      const renderedH = img.naturalHeight * scale;
+      const offsetX = (rect.width - renderedW) / 2;
+      const offsetY = (rect.height - renderedH) / 2;
+      const sx = Math.round((x - rect.left - offsetX) / scale);
+      const sy = Math.round((y - rect.top - offsetY) / scale);
+      if (sx < 0 || sy < 0 || sx >= img.naturalWidth || sy >= img.naturalHeight) return null;
+      try {
+        logoToneCanvas.width = 1;
+        logoToneCanvas.height = 1;
+        logoToneCtx.clearRect(0, 0, 1, 1);
+        logoToneCtx.drawImage(img, sx, sy, 1, 1, 0, 0, 1, 1);
+        const [r, g, b] = logoToneCtx.getImageData(0, 0, 1, 1).data;
+        return (r * .299) + (g * .587) + (b * .114);
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function updateLogoTone() {
+      logoToneTicking = false;
+      if (!brandLogo) return;
+      const rect = brandLogo.getBoundingClientRect();
+      const points = [
+        [rect.left + rect.width * .22, rect.top + rect.height * .58],
+        [rect.left + rect.width * .5, rect.top + rect.height * .58],
+        [rect.left + rect.width * .78, rect.top + rect.height * .58]
+      ];
+      const luminances = [];
+      points.forEach(([x, y]) => {
+        const element = document.elementFromPoint(x, y);
+        const img = element && (element.matches(".work-img") ? element : element.closest(".work-frame")?.querySelector(".work-img"));
+        const luminance = sampleImageLuminance(img, x, y);
+        if (luminance !== null) luminances.push(luminance);
+      });
+      const average = luminances.length ? luminances.reduce((sum, value) => sum + value, 0) / luminances.length : 245;
+      brandLogo.classList.toggle("is-light", average < 118);
+    }
+
+    function scheduleLogoToneUpdate() {
+      if (logoToneTicking) return;
+      logoToneTicking = true;
+      requestAnimationFrame(updateLogoTone);
+    }
+
     function renderFilters() {
       filtersEl.innerHTML = categories.map(category => (
         `<button class="filter-btn ${category === state.filter ? "is-active" : ""}" data-filter="${category}">${category}</button>`
@@ -866,7 +837,7 @@
     }
 
     function renderCards() {
-      state.items = state.filter === "전체"
+      state.items = state.filter === "?꾩껜"
         ? [...portfolioItems]
         : portfolioItems.filter(item => item.category === state.filter);
       state.index = 0;
@@ -898,7 +869,7 @@
 
     function renderDetailMedia(item, src, index) {
       const titleClass = index === 0 ? " is-title-image" : "";
-      return `<img class="detail-image${titleClass}" style="--order:${index}" src="${src}" alt="${item.title} 이미지 ${index + 1}">`;
+      return `<img class="detail-image${titleClass}" style="--order:${index}" src="${src}" alt="${item.title} ?대?吏 ${index + 1}">`;
     }
 
     function setupLazyImages() {
@@ -912,14 +883,20 @@
             return;
           }
           img.src = img.dataset.src;
-          img.onload = () => img.classList.add("is-loaded");
+          img.onload = () => {
+            img.classList.add("is-loaded");
+            scheduleLogoToneUpdate();
+          };
           lazyObserver.unobserve(img);
         });
       }, { root: null, rootMargin: "520px" });
       track.querySelectorAll("img[data-src]").forEach(img => lazyObserver.observe(img));
       track.querySelectorAll(".work-img[src]").forEach(img => {
         if (img.complete) img.classList.add("is-loaded");
-        else img.onload = () => img.classList.add("is-loaded");
+        else img.onload = () => {
+          img.classList.add("is-loaded");
+          scheduleLogoToneUpdate();
+        };
       });
     }
 
@@ -1317,10 +1294,10 @@
       detailTitle.textContent = item.title;
       detailDesc.textContent = item.description;
       detailSpecs.innerHTML = `
-        <dt>업종</dt><dd>${item.industry}</dd>
-        <dt>작업분야</dt><dd>${item.field}</dd>
-        <dt>사용 프로그램</dt><dd>${item.tools}</dd>
-        <dt>제작년도</dt><dd>${item.year}</dd>
+        <dt>?낆쥌</dt><dd>${item.industry}</dd>
+        <dt>?묒뾽遺꾩빞</dt><dd>${item.field}</dd>
+        <dt>?ъ슜 ?꾨줈洹몃옩</dt><dd>${item.tools}</dd>
+        <dt>?쒖옉?꾨룄</dt><dd>${item.year}</dd>
       `;
 
       detailMedia.innerHTML = `
@@ -1328,11 +1305,14 @@
           ${gallery.map((src, index) => renderDetailMedia(item, src, index)).join("")}
         </div>
       `;
-      lockPage();
       overlay.classList.add("is-open");
-      overlay.offsetHeight;
-      overlay.classList.add("is-visible");
       overlay.setAttribute("aria-hidden", "false");
+      requestAnimationFrame(() => {
+        lockPage();
+        requestAnimationFrame(() => {
+          overlay.classList.add("is-visible");
+        });
+      });
       if (!detailHistoryOpen) {
         try {
           history.pushState({ showroomDetail: true }, "", window.location.href);
@@ -1358,10 +1338,10 @@
 
       overlay.classList.remove("is-visible");
       overlay.setAttribute("aria-hidden", "true");
+      unlockPage();
       setTimeout(() => {
         overlay.classList.remove("is-open");
         overlay.classList.remove("is-closing");
-        unlockPage();
         activeSourceCard = null;
         activeSourceIndex = -1;
         detailClosing = false;
@@ -1461,7 +1441,9 @@
     window.addEventListener("resize", () => {
       measureStep();
       updateTransforms(true);
+      scheduleLogoToneUpdate();
     });
+    window.addEventListener("scroll", scheduleLogoToneUpdate, { passive: true });
 
     async function initShowroom() {
       portfolioItems = await loadPortfolioItems();
@@ -1476,12 +1458,14 @@
       renderCards();
       updateTransforms(true);
       finishLoading();
+      scheduleLogoToneUpdate();
     }
 
     initShowroom().catch(() => {
       renderFilters();
       renderCards();
       finishLoading();
+      scheduleLogoToneUpdate();
     });
   </script>
 </body>

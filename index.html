@@ -30,8 +30,63 @@
       letter-spacing: 0;
       -webkit-font-smoothing: antialiased;
     }
+    body.is-loading .app,
+    body.is-loading .overlay {
+      visibility: hidden;
+    }
     button { font: inherit; color: inherit; }
     img { display: block; max-width: 100%; }
+    .loading-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      display: grid;
+      place-items: center;
+      background: #f5f5f5;
+      color: rgba(17,17,17,.72);
+      transition: opacity .38s var(--ease), visibility .38s var(--ease);
+    }
+    .loading-screen.is-done {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .loading-mark {
+      display: grid;
+      justify-items: center;
+      gap: 18px;
+      transform: translateY(-8px);
+    }
+    .loading-logo {
+      width: clamp(132px, 38vw, 190px);
+      height: auto;
+      opacity: .92;
+    }
+    .loading-line {
+      width: 112px;
+      height: 2px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(17,17,17,.08);
+    }
+    .loading-line::before {
+      content: "";
+      display: block;
+      width: 42%;
+      height: 100%;
+      border-radius: inherit;
+      background: rgba(17,17,17,.5);
+      animation: loadingMove 1.05s ease-in-out infinite;
+    }
+    .loading-text {
+      font-size: 11px;
+      letter-spacing: .08em;
+      color: rgba(17,17,17,.5);
+    }
+    @keyframes loadingMove {
+      0% { transform: translateX(-120%); }
+      100% { transform: translateX(250%); }
+    }
     .app {
       position: relative;
       min-height: 100svh;
@@ -222,6 +277,7 @@
     .work-card {
       position: relative;
       width: var(--card-w);
+      height: clamp(260px, 46svh, 430px);
       flex: 0 0 auto;
       border: 0;
       border-radius: 8px;
@@ -229,10 +285,13 @@
       background: #1a1a1a;
       box-shadow: none;
       transform-origin: center;
-      will-change: transform, opacity, filter;
+      will-change: transform, opacity;
       cursor: pointer;
       transition: box-shadow .28s var(--ease);
       transform-style: preserve-3d;
+      display: grid;
+      place-items: center;
+      contain: layout paint style;
     }
     .work-card.is-transition-source {
       opacity: 0 !important;
@@ -267,9 +326,9 @@
       z-index: 1;
       border-radius: 8px;
       width: 100%;
-      height: auto;
-      max-height: calc(100svh - 240px);
-      object-fit: contain;
+      height: 100%;
+      max-height: none;
+      object-fit: cover;
       background: transparent;
       opacity: 0;
       transition: opacity .4s ease;
@@ -617,7 +676,14 @@
     }
   </style>
 </head>
-<body>
+<body class="is-loading">
+  <div class="loading-screen" id="loadingScreen" role="status" aria-live="polite">
+    <div class="loading-mark">
+      <img class="loading-logo" src="images/type-logo.png" alt="TheDesignUncle">
+      <div class="loading-line" aria-hidden="true"></div>
+      <div class="loading-text">LOADING</div>
+    </div>
+  </div>
   <script src="gallery-data.js"></script>
   <script>
     const STORAGE_KEY = "uncleDesignPortfolioItems";
@@ -832,6 +898,7 @@
     const detailTitle = document.getElementById("detailTitle");
     const detailDesc = document.getElementById("detailDesc");
     const detailSpecs = document.getElementById("detailSpecs");
+    const loadingScreen = document.getElementById("loadingScreen");
 
     let cards = [];
     let shadows = [];
@@ -842,6 +909,7 @@
     let detailClosing = false;
     let overlayTap = null;
     const visualState = new WeakMap();
+    const visibleRange = 4.25;
 
     function renderFilters() {
       filtersEl.innerHTML = categories.map(category => (
@@ -880,7 +948,7 @@
     function renderCardMedia(item) {
       const gallery = (item.gallery || []).filter(src => !/\.html($|[?#])/i.test(src));
       const src = gallery[0] || item.image || item.html || "";
-      return `<img class="work-img" alt="${item.title}" src="${src}" loading="lazy" decoding="async">`;
+      return `<img class="work-img" alt="${item.title}" data-src="${src}" loading="lazy" decoding="async">`;
     }
 
     function renderDetailMedia(item, src, index) {
@@ -894,16 +962,49 @@
         entries.forEach(entry => {
           if (!entry.isIntersecting) return;
           const img = entry.target;
+          if (img.src) {
+            lazyObserver.unobserve(img);
+            return;
+          }
           img.src = img.dataset.src;
           img.onload = () => img.classList.add("is-loaded");
           lazyObserver.unobserve(img);
         });
-      }, { root: null, rootMargin: "320px" });
+      }, { root: null, rootMargin: "520px" });
       track.querySelectorAll("img[data-src]").forEach(img => lazyObserver.observe(img));
       track.querySelectorAll(".work-img[src]").forEach(img => {
         if (img.complete) img.classList.add("is-loaded");
         else img.onload = () => img.classList.add("is-loaded");
       });
+    }
+
+    function loadImageElement(img) {
+      if (!img) return Promise.resolve();
+      if (!img.src) img.src = img.dataset.src;
+      return new Promise(resolve => {
+        if (img.complete && img.naturalWidth) {
+          img.classList.add("is-loaded");
+          resolve();
+          return;
+        }
+        img.onload = () => {
+          img.classList.add("is-loaded");
+          resolve();
+        };
+        img.onerror = resolve;
+      });
+    }
+
+    async function preloadOpeningImages() {
+      const firstImages = cards.slice(0, Math.min(7, cards.length)).map(card => card.querySelector(".work-img"));
+      await Promise.all(firstImages.map(loadImageElement));
+    }
+
+    function finishLoading() {
+      document.body.classList.remove("is-loading");
+      if (!loadingScreen) return;
+      loadingScreen.classList.add("is-done");
+      setTimeout(() => loadingScreen.remove(), 480);
     }
 
     function measureStep() {
@@ -918,7 +1019,7 @@
     }
 
     function startFreeGlide(extraVelocity = 0) {
-      state.glideVelocity = Math.max(-.34, Math.min(.34, extraVelocity * 1.65));
+      state.glideVelocity = Math.max(-.62, Math.min(.62, extraVelocity * 2.55));
       dragHint.classList.add("is-quiet");
       startAnimation();
     }
@@ -950,6 +1051,21 @@
       cards.forEach((card, i) => {
         const signed = i - state.current;
         const distance = Math.abs(signed);
+        const shadow = shadows[i];
+        if (distance > visibleRange) {
+          card.style.visibility = "hidden";
+          card.style.pointerEvents = "none";
+          card.style.opacity = "0";
+          if (shadow) {
+            shadow.style.visibility = "hidden";
+            shadow.style.opacity = "0";
+          }
+          return;
+        }
+        card.style.visibility = "visible";
+        card.style.pointerEvents = "";
+        if (shadow) shadow.style.visibility = "visible";
+
         const depthFactor = Math.min(distance, 4.2);
         const scale = Math.max(.42, 1 - depthFactor * .17);
         const opacity = Math.max(.08, 1 - distance * .4);
@@ -976,17 +1092,14 @@
         card.style.setProperty("--shine", String(next.shine));
         card.style.zIndex = String(1000 - Math.round(distance * 10));
 
-        const shadow = shadows[i];
         if (shadow) {
           const shadowDepth = Math.min(distance, 3.4);
           const shadowScale = Math.max(.12, 1.32 / (1 + shadowDepth * 1.35));
           const shadowOpacity = Math.max(.008, .42 / (1 + shadowDepth * 2.65));
           const shadowDrift = signed * -26;
           const shadowDrop = -shadowDepth * 18;
-          const shadowBlur = 16 + shadowDepth * 5;
           shadow.style.transform = `translate3d(${shadowDrift}px, ${shadowDrop}px, 0) scaleX(${shadowScale}) scaleY(${Math.max(.12, shadowScale * .28)})`;
           shadow.style.opacity = shadowOpacity;
-          shadow.style.filter = `blur(${shadowBlur}px)`;
         }
       });
 
@@ -1009,6 +1122,7 @@
     }
 
     function pointerDown(event) {
+      if (event.cancelable) event.preventDefault();
       state.dragging = true;
       state.startX = event.clientX;
       state.startY = event.clientY;
@@ -1026,12 +1140,13 @@
 
     function pointerMove(event) {
       if (!state.dragging) return;
+      if (event.cancelable) event.preventDefault();
       const dx = event.clientX - state.startX;
       const dy = event.clientY - state.startY;
       const now = performance.now();
       if (Math.hypot(dx, dy) > 8) state.moved = true;
-      state.target = clampIndex(state.startTarget - dx / state.cardStep);
-      state.velocity = -((event.clientX - state.lastX) / Math.max(8, now - state.lastTime)) * 16 / state.cardStep;
+      state.target = clampIndex(state.startTarget - (dx * 1.42) / state.cardStep);
+      state.velocity = -((event.clientX - state.lastX) / Math.max(8, now - state.lastTime)) * 23 / state.cardStep;
       motionCue.style.setProperty("--drag-pull", String(Math.max(-1, Math.min(1, dx / 86))));
       state.lastX = event.clientX;
       state.lastTime = now;
@@ -1058,7 +1173,7 @@
           return;
         }
       }
-      state.target = clampIndex(state.current + state.velocity * .8);
+      state.target = clampIndex(state.current + state.velocity * 1.12);
       startFreeGlide(state.velocity);
     }
 
@@ -1268,9 +1383,16 @@
       state.items = [...portfolioItems];
       renderFilters();
       renderCards();
+      await preloadOpeningImages();
+      updateTransforms(true);
+      finishLoading();
     }
 
-    initShowroom();
+    initShowroom().catch(() => {
+      renderFilters();
+      renderCards();
+      finishLoading();
+    });
   </script>
 </body>
 </html>

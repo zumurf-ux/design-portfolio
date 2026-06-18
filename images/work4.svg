@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1600">
+  <rect width="900" height="1600" fill="#111"/>
+  <rect x="64" y="64" width="772" height="1472" rx="24" fill="#f7f3e8"/>
+  <text x="130" y="220" font-size="74" font-weight="900" font-family="Arial, sans-serif" fill="#111">정담반찬</text>
+  <text x="130" y="304" font-size="44" font-family="Arial, sans-serif" fill="#444">OPEN FLYER</text>
+  <rect x="128" y="390" width="300" height="300" rx="150" fill="#79865c"/>
+  <rect x="472" y="390" width="300" height="300" rx="150" fill="#b94f38"/>
+  <rect x="128" y="744" width="644" height="220" rx="18" fill="#111"/>
+  <text x="450" y="880" text-anchor="middle" font-size="62" font-weight="900" font-family="Arial, sans-serif" fill="#fff">오픈 특가</text>
+  <path d="M130 1080h640M130 1188h520M130 1296h600" stroke="#111" stroke-width="14" opacity=".75"/>
+</svg>

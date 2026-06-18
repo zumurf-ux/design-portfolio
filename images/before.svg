@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1600">
+  <rect width="900" height="1600" fill="#2a2a2a"/>
+  <rect x="104" y="300" width="692" height="360" fill="#555"/>
+  <text x="450" y="510" text-anchor="middle" font-size="82" font-weight="800" font-family="Arial, sans-serif" fill="#ddd">OLD SIGN</text>
+  <path d="M180 840h540M180 950h430M180 1060h510" stroke="#777" stroke-width="28"/>
+  <text x="450" y="1320" text-anchor="middle" font-size="44" font-family="Arial, sans-serif" fill="#999">Before</text>
+</svg>

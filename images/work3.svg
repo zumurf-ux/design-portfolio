@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1600">
+  <rect width="900" height="1600" fill="#151515"/>
+  <rect x="66" y="66" width="768" height="1468" rx="24" fill="#e8e8e4"/>
+  <rect x="128" y="128" width="644" height="860" rx="20" fill="#4d6b5b"/>
+  <circle cx="450" cy="560" r="230" fill="#f0d6b4"/>
+  <circle cx="450" cy="560" r="156" fill="#6b3f2e"/>
+  <text x="450" y="1120" text-anchor="middle" font-size="82" font-weight="900" font-family="Arial, sans-serif" fill="#1a1a1a">카페 오후</text>
+  <text x="450" y="1210" text-anchor="middle" font-size="42" font-family="Arial, sans-serif" fill="#333">NEW SEASON BANNER</text>
+  <path d="M210 1320h480" stroke="#1a1a1a" stroke-width="8"/>
+</svg>

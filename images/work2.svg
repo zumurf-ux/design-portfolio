@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1600">
+  <rect width="900" height="1600" fill="#101010"/>
+  <rect x="70" y="180" width="760" height="1240" rx="30" fill="#1f1f1f"/>
+  <rect x="130" y="260" width="640" height="280" rx="12" fill="#f4f1e8"/>
+  <text x="450" y="435" text-anchor="middle" font-size="110" font-weight="900" font-family="Arial, sans-serif" fill="#111">삼촌국수</text>
+  <rect x="174" y="640" width="552" height="512" rx="256" fill="#d9c392"/>
+  <path d="M295 870c90 72 220 72 310 0" fill="none" stroke="#111" stroke-width="26" stroke-linecap="round"/>
+  <path d="M315 790h270" stroke="#111" stroke-width="24" stroke-linecap="round"/>
+  <text x="450" y="1280" text-anchor="middle" font-size="48" font-weight="800" font-family="Arial, sans-serif" fill="#fff">SIGN SYSTEM</text>
+</svg>

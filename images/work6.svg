@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1600">
+  <rect width="900" height="1600" fill="#121212"/>
+  <rect x="80" y="90" width="740" height="1420" rx="26" fill="#f1eee6"/>
+  <circle cx="450" cy="570" r="250" fill="#111"/>
+  <path d="M330 580c35-86 205-86 240 0 36 90-25 170-120 170s-156-80-120-170z" fill="#f1eee6"/>
+  <path d="M366 500c34 36 72 36 106 0 26-28 66-28 98 0" fill="none" stroke="#f1eee6" stroke-width="26" stroke-linecap="round"/>
+  <text x="450" y="1028" text-anchor="middle" font-size="84" font-weight="900" font-family="Arial, sans-serif" fill="#111">로스터리 결</text>
+  <text x="450" y="1120" text-anchor="middle" font-size="40" font-family="Arial, sans-serif" fill="#333">LOGO IDENTITY</text>
+</svg>

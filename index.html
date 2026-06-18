@@ -1,0 +1,1276 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f5f5f5">
+  <title>디자인하는삼촌 | 모바일 포트폴리오 쇼룸</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f5f5;
+      --text: #111111;
+      --muted: rgba(17, 17, 17, .58);
+      --soft: rgba(17, 17, 17, .08);
+      --line: rgba(17, 17, 17, .12);
+      --accent: #111111;
+      --card-w: min(72vw, 340px);
+      --card-gap: clamp(18px, 7vw, 38px);
+      --ease: cubic-bezier(.22, 1, .36, 1);
+      --glass: rgba(245, 245, 245, .105);
+      --glass-strong: rgba(245, 245, 245, .18);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--text); }
+    body {
+      font-family: Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-weight: 500;
+      overflow-x: hidden;
+      letter-spacing: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+    button { font: inherit; color: inherit; }
+    img { display: block; max-width: 100%; }
+    .app {
+      position: relative;
+      min-height: 100svh;
+      background:
+        linear-gradient(rgba(255,255,255,.18), rgba(255,255,255,.08)),
+        url("images/perspective-bg.svg") center center / cover no-repeat fixed,
+        #f5f5f5;
+      isolation: isolate;
+      overflow: visible;
+    }
+
+    .topbar {
+      position: fixed;
+      inset: max(14px, env(safe-area-inset-top)) 0 auto 0;
+      z-index: 50;
+      padding: 0 16px;
+      pointer-events: none;
+    }
+    .brand-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    .brand-logo {
+      width: clamp(108px, 31vw, 156px);
+      height: auto;
+      object-fit: contain;
+      display: block;
+    }
+    .count {
+      font-size: 12px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .filters {
+      position: fixed;
+      top: calc(max(14px, env(safe-area-inset-top)) + 36px);
+      left: 0;
+      right: 0;
+      z-index: 45;
+      display: none;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 8px 16px 11px;
+      scrollbar-width: none;
+      mask-image: linear-gradient(90deg, transparent 0, #000 16px, #000 calc(100% - 16px), transparent 100%);
+    }
+    .filters::-webkit-scrollbar { display: none; }
+    .filter-btn {
+      flex: 0 0 auto;
+      min-height: 34px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(255,255,255,.18);
+      padding: 0 14px;
+      color: rgba(255,255,255,.82);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.12),
+        0 12px 30px rgba(0,0,0,.22);
+      opacity: .72;
+      cursor: pointer;
+      transition: transform .25s var(--ease), opacity .25s var(--ease), background .25s var(--ease), color .25s var(--ease);
+    }
+    .filter-btn:hover {
+      opacity: 1;
+      transform: translateY(-1px);
+    }
+    .filter-btn.is-active {
+      background: rgba(255,255,255,.78);
+      color: #101010;
+      font-weight: 500;
+      opacity: .9;
+    }
+
+    .hero {
+      position: relative;
+      min-height: 100svh;
+      padding: 108px 0 112px;
+      overflow: hidden;
+    }
+    .drag-hint {
+      position: fixed;
+      left: 50%;
+      bottom: calc(92px + env(safe-area-inset-bottom));
+      transform: translateX(-50%);
+      z-index: 35;
+      display: grid;
+      justify-items: center;
+      gap: 8px;
+      min-width: 96px;
+      pointer-events: none;
+      opacity: .72;
+      transition: opacity .25s var(--ease);
+    }
+    .drag-hint.is-quiet { opacity: .42; }
+    .drag-hint.is-active { opacity: .9; }
+    .count-bottom {
+      color: rgba(17,17,17,.5);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: .04em;
+    }
+    .motion-cue {
+      --drag-pull: 0;
+      width: 74px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+    }
+    .motion-cue span {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(17,17,17,.55);
+      box-shadow: 0 0 18px rgba(0,0,0,.12);
+      opacity: .36;
+      transform: translate3d(0,0,0) scale(.78);
+      transition: transform .24s var(--ease), opacity .24s var(--ease), width .24s var(--ease);
+    }
+    .motion-cue span:nth-child(2) {
+      width: 16px;
+      opacity: .72;
+      transform: translate3d(0,0,0) scale(1);
+    }
+    .drag-hint.is-active .motion-cue span {
+      opacity: .78;
+      transform: translate3d(calc(var(--drag-pull) * 18px), 0, 0) scale(1);
+    }
+    .drag-hint.is-active .motion-cue span:nth-child(1) {
+      transform: translate3d(calc(var(--drag-pull) * 10px), 0, 0) scale(.82);
+    }
+    .drag-hint.is-active .motion-cue span:nth-child(3) {
+      transform: translate3d(calc(var(--drag-pull) * 26px), 0, 0) scale(.82);
+    }
+
+    .showroom {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      perspective: 760px;
+      perspective-origin: 50% 46%;
+      touch-action: none;
+      cursor: grab;
+      user-select: none;
+    }
+    .showroom.is-dragging { cursor: grabbing; }
+    .track {
+      display: flex;
+      align-items: center;
+      gap: var(--card-gap);
+      padding: 0 calc((100vw - var(--card-w)) / 2);
+      will-change: transform;
+      transform: translate3d(0,0,0);
+      transform-style: preserve-3d;
+    }
+    .shadow-track {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 75%;
+      display: flex;
+      align-items: center;
+      gap: var(--card-gap);
+      padding: 0 calc((100vw - var(--card-w)) / 2);
+      pointer-events: none;
+      will-change: transform;
+      z-index: 0;
+    }
+    .gallery-shadow {
+      width: var(--card-w);
+      height: 34px;
+      flex: 0 0 auto;
+      border-radius: 999px;
+      background: radial-gradient(ellipse at center, rgba(0,0,0,.26) 0%, rgba(0,0,0,.12) 44%, rgba(0,0,0,.04) 68%, transparent 88%);
+      filter: blur(16px);
+      opacity: 0;
+      transform: translate3d(0,0,0) scaleX(1.3) scaleY(.44);
+      transform-origin: center center;
+      will-change: transform, opacity, filter;
+    }
+    .work-card {
+      position: relative;
+      width: var(--card-w);
+      flex: 0 0 auto;
+      border: 0;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #1a1a1a;
+      box-shadow: none;
+      transform-origin: center;
+      will-change: transform, opacity, filter;
+      cursor: pointer;
+      transition: box-shadow .28s var(--ease);
+      transform-style: preserve-3d;
+    }
+    .work-card.is-transition-source {
+      opacity: 0 !important;
+      pointer-events: none;
+      transition: none !important;
+    }
+    .work-card::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      z-index: 3;
+      pointer-events: none;
+      background:
+        linear-gradient(120deg, rgba(255,255,255,.32), transparent 28%, transparent 68%, rgba(255,255,255,.16)),
+        radial-gradient(circle at 50% 12%, rgba(255,255,255,.28), transparent 34%);
+      mix-blend-mode: screen;
+      opacity: var(--shine, .34);
+      transition: opacity .25s var(--ease);
+    }
+    .work-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(0,0,0,var(--shade, 0)) 0%, rgba(0,0,0,var(--shade, 0)) 100%),
+        radial-gradient(ellipse at 50% 32%, transparent 18%, rgba(0,0,0,calc(var(--shade, 0) * .72)) 82%),
+        linear-gradient(180deg, transparent 48%, rgba(0,0,0,.86) 100%);
+      pointer-events: none;
+    }
+    .work-img {
+      position: relative;
+      z-index: 1;
+      border-radius: 8px;
+      width: 100%;
+      height: auto;
+      max-height: calc(100svh - 240px);
+      object-fit: contain;
+      background: transparent;
+      opacity: 0;
+      transition: opacity .4s ease;
+    }
+    .work-img.is-loaded { opacity: 1; }
+    .work-card.is-html .work-meta {
+      display: none;
+    }
+    .work-card.is-html::after {
+      background:
+        linear-gradient(180deg, rgba(0,0,0,var(--shade, 0)) 0%, rgba(0,0,0,var(--shade, 0)) 100%),
+        linear-gradient(180deg, transparent 68%, rgba(0,0,0,.16) 100%);
+    }
+    .work-meta {
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      bottom: 13px;
+      z-index: 2;
+      opacity: .72;
+    }
+    .work-title {
+      margin: 0 0 6px;
+      font-size: clamp(17px, 4.8vw, 22px);
+      line-height: 1.12;
+      font-weight: 500;
+      overflow-wrap: anywhere;
+      color: rgba(255,255,255,.78);
+      text-shadow: 0 8px 22px rgba(0,0,0,.55);
+    }
+    .progress {
+      position: fixed;
+      left: 18px;
+      right: 18px;
+      bottom: calc(58px + env(safe-area-inset-bottom));
+      z-index: 34;
+      height: 1px;
+      background: rgba(255,255,255,.14);
+      display: none;
+    }
+    .progress span {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: #fff;
+      transform-origin: left;
+      transition: transform .2s linear;
+    }
+
+    .contact-bar {
+      position: fixed;
+      left: 12px;
+      right: 12px;
+      bottom: calc(10px + env(safe-area-inset-bottom));
+      z-index: 70;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+    .contact-bar a {
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      border-radius: 8px;
+      border: 0;
+      background: rgba(255,255,255,.46);
+      color: rgba(17,17,17,.72);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: .08em;
+      white-space: nowrap;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.7),
+        0 12px 34px rgba(0,0,0,.12);
+      opacity: .58;
+      transition: transform .24s var(--ease), opacity .24s var(--ease), background .24s var(--ease);
+    }
+    .contact-bar svg {
+      width: 15px;
+      height: 15px;
+      flex: 0 0 auto;
+      stroke: currentColor;
+      stroke-width: 1.9;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+      opacity: .82;
+    }
+    .contact-bar .kakao-icon text {
+      fill: currentColor;
+      stroke: none;
+      font-size: 10px;
+      font-weight: 700;
+      font-family: Arial, sans-serif;
+    }
+    .contact-bar a:hover,
+    .contact-bar a:focus-visible {
+      opacity: 1;
+      transform: translateY(-2px);
+      background: rgba(255,255,255,.7);
+    }
+    .contact-bar a:active {
+      opacity: .88;
+      transform: translateY(.5px) scale(.992);
+      background: rgba(255,255,255,.62);
+      box-shadow:
+        inset 0 1px 3px rgba(0,0,0,.07),
+        0 8px 22px rgba(0,0,0,.1);
+    }
+    .copyright {
+      grid-column: 1 / -1;
+      color: rgba(17,17,17,.42);
+      font-size: 10px;
+      text-align: center;
+      letter-spacing: 0;
+      line-height: 1.2;
+      padding-top: 1px;
+      font-weight: 400;
+      pointer-events: none;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      background:
+        linear-gradient(rgba(255,255,255,.18), rgba(255,255,255,.08)),
+        url("images/perspective-bg.svg") center center / cover no-repeat fixed,
+        #f5f5f5;
+      opacity: 0;
+      transition: opacity .34s var(--ease);
+    }
+    .overlay.is-open { display: block; }
+    .overlay.is-visible { opacity: 1; }
+    .expand-ghost {
+      position: fixed;
+      z-index: 130;
+      overflow: hidden;
+      border-radius: 8px;
+      background: transparent;
+      pointer-events: none;
+      box-shadow:
+        0 42px 110px rgba(0,0,0,.62),
+        0 18px 48px rgba(0,0,0,.46);
+      transform-origin: center center;
+      will-change: transform, opacity, border-radius;
+      transition:
+        transform .36s cubic-bezier(.18, 1, .28, 1),
+        opacity .08s linear,
+        border-radius .36s cubic-bezier(.18, 1, .28, 1);
+    }
+    .expand-ghost img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: transparent;
+    }
+    .detail {
+      height: 100%;
+      overflow-y: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      touch-action: pan-y;
+      padding: max(12px, env(safe-area-inset-top)) 16px calc(28px + env(safe-area-inset-bottom));
+    }
+    .detail::-webkit-scrollbar { display: none; }
+    .detail-shell {
+      max-width: 840px;
+      margin: 0 auto;
+      display: grid;
+      gap: 18px;
+      opacity: 0;
+      transform: translateY(72px) scale(.972);
+      transition: opacity .58s var(--ease), transform .66s var(--ease);
+    }
+    .overlay.is-visible .detail-shell {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    .overlay.is-closing .detail-shell {
+      opacity: 0;
+      transform: translateY(72px) scale(.972);
+    }
+    .close {
+      display: none;
+      position: sticky;
+      top: 8px;
+      justify-self: end;
+      z-index: 2;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.08);
+      cursor: pointer;
+    }
+    .detail-gallery {
+      width: min(78vw, 390px);
+      justify-self: center;
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+    .overlay.is-html-detail .detail-gallery,
+    .overlay.is-image-detail .detail-gallery {
+      width: min(94vw, 560px);
+    }
+    .overlay.is-html-detail .detail-shell,
+    .overlay.is-image-detail .detail-shell {
+      grid-template-columns: 1fr;
+    }
+    .overlay.is-html-detail .detail-copy,
+    .overlay.is-image-detail .detail-copy {
+      display: none;
+    }
+    .detail-image {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      object-fit: contain;
+      background: #222;
+      opacity: 0;
+      transform: translateY(34px) scale(.965);
+      transition:
+        opacity .5s var(--ease),
+        transform .64s var(--ease);
+      box-shadow: 0 26px 70px rgba(0,0,0,.38);
+      transition-delay: calc(var(--order, 0) * 68ms + 120ms);
+    }
+    .detail-image.is-title-image {
+      transform: translateY(-22px) scale(.975);
+      transition-delay: 0ms;
+      box-shadow:
+        0 34px 86px rgba(0,0,0,.5),
+        0 0 0 1px rgba(255,255,255,.08);
+    }
+    .overlay.is-visible .detail-image {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    .overlay.is-visible .detail-image:not(.is-title-image) {
+      animation: detailSettle .72s var(--ease) both;
+      animation-delay: calc(var(--order, 0) * 72ms + 160ms);
+    }
+    .detail-copy h2 {
+      margin: 4px 0 12px;
+      font-size: clamp(30px, 9vw, 54px);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+    .detail-copy p {
+      margin: 0 0 18px;
+      color: rgba(255,255,255,.78);
+      line-height: 1.65;
+    }
+    .specs {
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      gap: 10px 14px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+      color: rgba(255,255,255,.8);
+      font-size: 14px;
+    }
+    .specs dt { color: rgba(255,255,255,.45); }
+    .specs dd { margin: 0; }
+    .ba-wrap {
+      position: relative;
+      width: min(78vw, 390px);
+      aspect-ratio: 4 / 5;
+      justify-self: center;
+      overflow: hidden;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      touch-action: none;
+    }
+    .ba-wrap img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .ba-after {
+      clip-path: inset(0 0 0 50%);
+    }
+    .ba-line {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 2px;
+      background: #fff;
+      transform: translateX(-1px);
+      pointer-events: none;
+    }
+    .ba-line::after {
+      content: "↔";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #fff;
+      color: #111;
+      transform: translate(-50%, -50%);
+      font-weight: 500;
+    }
+
+    @keyframes intro {
+      from { opacity: 0; transform: translateY(16px) scale(.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes detailSettle {
+      0% { opacity: 0; transform: translateY(42px) scale(.965); }
+      62% { opacity: 1; transform: translateY(-4px) scale(1.006); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @media (min-width: 760px) {
+      :root { --card-w: min(44vw, 360px); --card-gap: 44px; }
+      .hero { padding-top: 108px; }
+      .detail-shell { grid-template-columns: minmax(280px, 390px) 1fr; align-items: start; }
+      .close { grid-column: 1 / -1; }
+      .detail-gallery, .ba-wrap { width: 100%; }
+      .detail-copy { padding-top: 8px; }
+    }
+
+    @media (orientation: landscape) and (max-height: 560px) {
+      :root { --card-w: min(31vw, 260px); }
+      .hero { padding: 82px 0 76px; }
+      .drag-hint { bottom: calc(86px + env(safe-area-inset-bottom)); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+<body>
+  <script src="gallery-data.js"></script>
+  <script>
+    const STORAGE_KEY = "uncleDesignPortfolioItems";
+    const DB_NAME = "uncleDesignPortfolioDB";
+    const DB_STORE = "portfolio";
+    const DB_ITEMS_KEY = "items";
+    const htmlPortfolioItems = Array.isArray(window.htmlGalleryItems) ? window.htmlGalleryItems : [];
+    const defaultPortfolioItems = htmlPortfolioItems.length ? htmlPortfolioItems : [
+      {
+        title: "양평두물머리해장국",
+        category: "메뉴판",
+        industry: "한식당",
+        field: "메뉴판 디자인",
+        image: "images/work1.svg",
+        gallery: ["images/work1.svg", "images/work2.svg", "images/work3.svg"],
+        description: "대표 메뉴가 빠르게 읽히도록 가격, 사진, 주문 흐름을 정리한 식당 메뉴판입니다.",
+        tools: "Photoshop, Illustrator",
+        year: "2026"
+      },
+      {
+        title: "삼촌국수",
+        category: "간판",
+        industry: "분식점",
+        field: "외부 간판",
+        image: "images/work2.svg",
+        gallery: ["images/work2.svg", "images/before.svg", "images/after.svg"],
+        description: "멀리서도 상호가 먼저 들어오도록 글자 대비와 야간 시인성을 중심으로 설계했습니다.",
+        tools: "Illustrator",
+        year: "2026",
+        beforeAfter: {
+          before: "images/before.svg",
+          after: "images/after.svg"
+        }
+      },
+      {
+        title: "카페 오후",
+        category: "배너",
+        industry: "카페",
+        field: "시즌 배너",
+        image: "images/work3.svg",
+        gallery: ["images/work3.svg"],
+        description: "신메뉴를 가까이서 보고 싶게 만드는 촬영형 구도와 짧은 카피를 사용했습니다.",
+        tools: "Photoshop",
+        year: "2025"
+      },
+      {
+        title: "정담반찬",
+        category: "전단지",
+        industry: "반찬가게",
+        field: "오픈 전단",
+        image: "images/work4.svg",
+        gallery: ["images/work4.svg"],
+        description: "첫 방문 혜택과 위치 정보를 한눈에 확인할 수 있게 구성한 오픈 홍보물입니다.",
+        tools: "Illustrator, Photoshop",
+        year: "2025"
+      },
+      {
+        title: "소담마켓",
+        category: "상세페이지",
+        industry: "온라인 판매",
+        field: "상품 상세페이지",
+        image: "images/work5.svg",
+        gallery: ["images/work5.svg"],
+        description: "상품의 장점, 사용 장면, 구매 이유가 자연스럽게 이어지도록 만든 상세페이지입니다.",
+        tools: "Figma, Photoshop",
+        year: "2026"
+      },
+      {
+        title: "로스터리 결",
+        category: "로고",
+        industry: "커피 브랜드",
+        field: "브랜드 로고",
+        image: "images/work6.svg",
+        gallery: ["images/work6.svg"],
+        description: "작은 컵, 스티커, 간판까지 선명하게 보이는 심플한 로고 시스템입니다.",
+        tools: "Illustrator",
+        year: "2025"
+      }
+    ];
+
+    function openPortfolioDB() {
+      return new Promise((resolve, reject) => {
+        if (!("indexedDB" in window)) {
+          reject(new Error("IndexedDB unavailable"));
+          return;
+        }
+        const request = indexedDB.open(DB_NAME, 1);
+        request.onupgradeneeded = () => request.result.createObjectStore(DB_STORE);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    async function readPortfolioFromDB() {
+      const db = await openPortfolioDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(DB_STORE, "readonly");
+        const request = tx.objectStore(DB_STORE).get(DB_ITEMS_KEY);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    async function loadPortfolioItems() {
+      try {
+        const saved = await readPortfolioFromDB();
+        if (Array.isArray(saved) && saved.length && !shouldPreferHtmlDefaults(saved)) return saved;
+      } catch (error) {}
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+        return Array.isArray(saved) && saved.length && !shouldPreferHtmlDefaults(saved) ? saved : defaultPortfolioItems;
+      } catch (error) {
+        return defaultPortfolioItems;
+      }
+    }
+
+    function shouldPreferHtmlDefaults(saved) {
+      return htmlPortfolioItems.length && (
+        saved.some(item => /^images\/work/i.test(item.image || "")) ||
+        saved.some(item => item.type === "html")
+      );
+    }
+
+    let portfolioItems = defaultPortfolioItems;
+  </script>
+
+  <main class="app">
+    <header class="topbar" aria-label="상단">
+      <div class="brand-row">
+        <img class="brand-logo" src="images/type-logo.png" alt="TheDesignUncle">
+      </div>
+    </header>
+
+    <nav class="filters" id="filters" aria-label="작품 카테고리"></nav>
+
+    <section class="hero" aria-label="포트폴리오 쇼룸">
+      <div class="showroom" id="showroom">
+        <div class="shadow-track" id="shadowTrack" aria-hidden="true"></div>
+        <div class="track" id="track"></div>
+      </div>
+      <div class="drag-hint" id="dragHint" aria-label="현재 작품 위치">
+        <div class="count count-bottom" id="countText">01 / 06</div>
+        <div class="motion-cue" id="motionCue" aria-hidden="true"><span></span><span></span><span></span></div>
+      </div>
+      <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
+    </section>
+
+    <div class="contact-bar" aria-label="문의하기">
+      <a href="tel:010-0000-0000">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 3.8 9 3.2l2.1 4.7-1.4 1.1c1 2 2.5 3.5 4.4 4.5l1.2-1.4 4.7 2.1-.7 2.5c-.3 1.1-1.3 1.8-2.4 1.7C10.4 18 5.2 12.8 4.8 6.2c-.1-1.1.7-2.1 1.8-2.4Z"/></svg>
+        <span>PHONE</span>
+      </a>
+      <a href="sms:010-0000-0000">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6.5h14a2 2 0 0 1 2 2v6.4a2 2 0 0 1-2 2H9l-4.2 3v-3H5a2 2 0 0 1-2-2V8.5a2 2 0 0 1 2-2Z"/><path d="M7.5 10.4h9M7.5 13.3h6"/></svg>
+        <span>SMS</span>
+      </a>
+      <a href="https://pf.kakao.com/" target="_blank" rel="noreferrer">
+        <svg class="kakao-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.3c5 0 9 3 9 6.7s-4 6.7-9 6.7c-.8 0-1.6-.1-2.4-.3L5.7 20l1-3.7C4.4 15.1 3 13.2 3 11c0-3.7 4-6.7 9-6.7Z"/><text x="12" y="14.4" text-anchor="middle">K</text></svg>
+        <span>KAKAOTALK</span>
+      </a>
+      <div class="copyright">© 2026 디자인하는삼촌. All rights reserved.</div>
+    </div>
+  </main>
+
+  <aside class="overlay" id="overlay" aria-hidden="true">
+    <div class="detail">
+      <div class="detail-shell">
+        <button class="close" id="closeBtn" aria-label="닫기">×</button>
+        <div id="detailMedia"></div>
+        <div class="detail-copy">
+          <h2 id="detailTitle"></h2>
+          <p id="detailDesc"></p>
+          <dl class="specs" id="detailSpecs"></dl>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <script>
+    const baseCategories = ["전체"];
+    const hiddenCategoryLabels = new Set(["포트폴리오", "이미지 갤러리", "HTML"]);
+    let categories = [...baseCategories];
+    const state = {
+      filter: "전체",
+      items: [...portfolioItems],
+      index: 0,
+      target: 0,
+      current: 0,
+      dragging: false,
+      startX: 0,
+      startTarget: 0,
+      velocity: 0,
+      lastX: 0,
+      lastTime: 0,
+      startY: 0,
+      moved: false,
+      glideVelocity: 0,
+      cardStep: 1
+    };
+
+    const filtersEl = document.getElementById("filters");
+    const track = document.getElementById("track");
+    const shadowTrack = document.getElementById("shadowTrack");
+    const showroom = document.getElementById("showroom");
+    const countText = document.getElementById("countText");
+    const progressBar = document.getElementById("progressBar");
+    const dragHint = document.getElementById("dragHint");
+    const motionCue = document.getElementById("motionCue");
+    const overlay = document.getElementById("overlay");
+    const closeBtn = document.getElementById("closeBtn");
+    const detailMedia = document.getElementById("detailMedia");
+    const detailTitle = document.getElementById("detailTitle");
+    const detailDesc = document.getElementById("detailDesc");
+    const detailSpecs = document.getElementById("detailSpecs");
+
+    let cards = [];
+    let shadows = [];
+    let lazyObserver;
+    let animationStarted = false;
+    let activeSourceCard = null;
+    let activeSourceIndex = -1;
+    let detailClosing = false;
+    let overlayTap = null;
+    const visualState = new WeakMap();
+
+    function renderFilters() {
+      filtersEl.innerHTML = categories.map(category => (
+        `<button class="filter-btn ${category === state.filter ? "is-active" : ""}" data-filter="${category}">${category}</button>`
+      )).join("");
+    }
+
+    function renderCards() {
+      state.items = state.filter === "전체"
+        ? [...portfolioItems]
+        : portfolioItems.filter(item => item.category === state.filter);
+      state.index = 0;
+      state.target = 0;
+      state.current = 0;
+      track.innerHTML = state.items.map((item, index) => `
+        <article class="work-card ${isHtmlMedia(item, item.html || item.image || "") ? "is-html" : ""}" data-index="${index}">
+          ${renderCardMedia(item)}
+          <div class="work-meta">
+            <h2 class="work-title">${item.title}</h2>
+          </div>
+        </article>
+      `).join("");
+      shadowTrack.innerHTML = state.items.map(() => `<span class="gallery-shadow"></span>`).join("");
+      cards = Array.from(track.querySelectorAll(".work-card"));
+      shadows = Array.from(shadowTrack.querySelectorAll(".gallery-shadow"));
+      cards.forEach(card => visualState.delete(card));
+      setupLazyImages();
+      measureStep();
+      updateTransforms(true);
+    }
+
+    function isHtmlMedia(item, src = "") {
+      return item.type === "html" || /\.html($|[?#])/i.test(src);
+    }
+
+    function renderCardMedia(item) {
+      const gallery = (item.gallery || []).filter(src => !/\.html($|[?#])/i.test(src));
+      const src = gallery[0] || item.image || item.html || "";
+      return `<img class="work-img" alt="${item.title}" src="${src}" loading="lazy" decoding="async">`;
+    }
+
+    function renderDetailMedia(item, src, index) {
+      const titleClass = index === 0 ? " is-title-image" : "";
+      return `<img class="detail-image${titleClass}" style="--order:${index}" src="${src}" alt="${item.title} 이미지 ${index + 1}">`;
+    }
+
+    function setupLazyImages() {
+      if (lazyObserver) lazyObserver.disconnect();
+      lazyObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          const img = entry.target;
+          img.src = img.dataset.src;
+          img.onload = () => img.classList.add("is-loaded");
+          lazyObserver.unobserve(img);
+        });
+      }, { root: null, rootMargin: "320px" });
+      track.querySelectorAll("img[data-src]").forEach(img => lazyObserver.observe(img));
+      track.querySelectorAll(".work-img[src]").forEach(img => {
+        if (img.complete) img.classList.add("is-loaded");
+        else img.onload = () => img.classList.add("is-loaded");
+      });
+    }
+
+    function measureStep() {
+      if (!cards.length) return;
+      const width = cards[0].offsetWidth;
+      const styles = getComputedStyle(track);
+      state.cardStep = width + parseFloat(styles.columnGap || styles.gap || 0);
+    }
+
+    function clampIndex(value) {
+      return Math.max(0, Math.min(state.items.length - 1, value));
+    }
+
+    function startFreeGlide(extraVelocity = 0) {
+      state.glideVelocity = Math.max(-.34, Math.min(.34, extraVelocity * 1.65));
+      dragHint.classList.add("is-quiet");
+      startAnimation();
+    }
+
+    function startAnimation() {
+      if (!animationStarted) {
+        animationStarted = true;
+        requestAnimationFrame(animate);
+      }
+    }
+
+    function updateTransforms(immediate = false) {
+      if (immediate) state.current = state.target;
+      else {
+        if (!state.dragging && Math.abs(state.glideVelocity) > .0004) {
+          state.target = clampIndex(state.target + state.glideVelocity);
+          state.glideVelocity *= .955;
+        } else if (!state.dragging) {
+          state.glideVelocity = 0;
+        }
+        state.current += (state.target - state.current) * (state.dragging ? .5 : .24);
+      }
+
+      const offset = -state.current * state.cardStep;
+      track.style.transform = `translate3d(${offset}px,0,0)`;
+      shadowTrack.style.transform = `translate3d(${offset}px,0,0)`;
+      track.style.filter = "";
+
+      cards.forEach((card, i) => {
+        const signed = i - state.current;
+        const distance = Math.abs(signed);
+        const depthFactor = Math.min(distance, 4.2);
+        const scale = Math.max(.42, 1 - depthFactor * .17);
+        const opacity = Math.max(.08, 1 - distance * .4);
+        const shade = Math.min(.88, distance * .38);
+        const depth = 150 - depthFactor * 220;
+        const lift = Math.min(distance, 2.8) * 30 + Math.sin((i + 1) * 1.35) * 6;
+        const sidePush = signed * -18;
+        const rotateY = Math.max(-34, Math.min(34, signed * -14));
+        const rotateX = Math.max(-7, Math.min(7, Math.sin(i * 1.7) * 2.6 - distance * 1.05));
+        const rotateZ = Math.max(-5, Math.min(5, signed * -1.55 + Math.sin(i * 1.2) * .8));
+        const shine = Math.max(.03, .5 - distance * .18);
+        const targetVisual = { sidePush, lift, depth, rotateX, rotateY, rotateZ, scale, opacity, shade, shine };
+        const previous = visualState.get(card) || targetVisual;
+        const ease = immediate ? 1 : .24;
+        const next = {};
+        Object.keys(targetVisual).forEach(key => {
+          next[key] = previous[key] + (targetVisual[key] - previous[key]) * ease;
+        });
+        visualState.set(card, next);
+        card.style.transform = `translate3d(${next.sidePush}px, ${next.lift}px, ${next.depth}px) rotateX(${next.rotateX}deg) rotateY(${next.rotateY}deg) rotateZ(${next.rotateZ}deg) scale(${next.scale})`;
+        card.style.opacity = next.opacity;
+        card.style.filter = "";
+        card.style.setProperty("--shade", String(next.shade));
+        card.style.setProperty("--shine", String(next.shine));
+        card.style.zIndex = String(1000 - Math.round(distance * 10));
+
+        const shadow = shadows[i];
+        if (shadow) {
+          const shadowDepth = Math.min(distance, 3.4);
+          const shadowScale = Math.max(.12, 1.32 / (1 + shadowDepth * 1.35));
+          const shadowOpacity = Math.max(.008, .42 / (1 + shadowDepth * 2.65));
+          const shadowDrift = signed * -26;
+          const shadowDrop = -shadowDepth * 18;
+          const shadowBlur = 16 + shadowDepth * 5;
+          shadow.style.transform = `translate3d(${shadowDrift}px, ${shadowDrop}px, 0) scaleX(${shadowScale}) scaleY(${Math.max(.12, shadowScale * .28)})`;
+          shadow.style.opacity = shadowOpacity;
+          shadow.style.filter = `blur(${shadowBlur}px)`;
+        }
+      });
+
+      const rounded = Math.round(state.current);
+      state.index = clampIndex(rounded);
+      countText.textContent = `${String(rounded + 1).padStart(2, "0")} / ${String(state.items.length).padStart(2, "0")}`;
+      const progress = state.items.length <= 1 ? 1 : rounded / (state.items.length - 1);
+      progressBar.style.transform = `scaleX(${Math.max(.08, progress || .08)})`;
+
+    }
+
+    function animate() {
+      updateTransforms(false);
+      const stillMoving = state.dragging || Math.abs(state.glideVelocity) > .0004 || Math.abs(state.target - state.current) > .001;
+      if (stillMoving) {
+        requestAnimationFrame(animate);
+      } else {
+        animationStarted = false;
+      }
+    }
+
+    function pointerDown(event) {
+      state.dragging = true;
+      state.startX = event.clientX;
+      state.startY = event.clientY;
+      state.startTarget = state.target;
+      state.lastX = event.clientX;
+      state.lastTime = performance.now();
+      state.velocity = 0;
+      state.glideVelocity = 0;
+      state.moved = false;
+      showroom.classList.add("is-dragging");
+      dragHint.classList.add("is-active");
+      motionCue.style.setProperty("--drag-pull", "0");
+      showroom.setPointerCapture(event.pointerId);
+    }
+
+    function pointerMove(event) {
+      if (!state.dragging) return;
+      const dx = event.clientX - state.startX;
+      const dy = event.clientY - state.startY;
+      const now = performance.now();
+      if (Math.hypot(dx, dy) > 8) state.moved = true;
+      state.target = clampIndex(state.startTarget - dx / state.cardStep);
+      state.velocity = -((event.clientX - state.lastX) / Math.max(8, now - state.lastTime)) * 16 / state.cardStep;
+      motionCue.style.setProperty("--drag-pull", String(Math.max(-1, Math.min(1, dx / 86))));
+      state.lastX = event.clientX;
+      state.lastTime = now;
+      startAnimation();
+    }
+
+    function pointerUp(event) {
+      if (!state.dragging) return;
+      state.dragging = false;
+      showroom.classList.remove("is-dragging");
+      dragHint.classList.remove("is-active");
+      motionCue.style.setProperty("--drag-pull", "0");
+      try { showroom.releasePointerCapture(event.pointerId); } catch (error) {}
+      if (!state.moved) {
+        const target = document.elementFromPoint(event.clientX, event.clientY);
+        const card = target && target.closest && target.closest(".work-card");
+        if (card) {
+          const index = Number(card.dataset.index);
+          state.target = index;
+          state.index = index;
+          state.glideVelocity = 0;
+          state.moved = true;
+          openDetail(state.items[index], card);
+          return;
+        }
+      }
+      state.target = clampIndex(state.current + state.velocity * .8);
+      startFreeGlide(state.velocity);
+    }
+
+    function wheelMove(event) {
+      state.glideVelocity = 0;
+      if (Math.abs(event.deltaX) < Math.abs(event.deltaY)) {
+        state.target = clampIndex(state.target + event.deltaY / 420);
+      } else {
+        state.target = clampIndex(state.target + event.deltaX / 420);
+      }
+      startAnimation();
+    }
+
+    function playZoomTransition(sourceCard, done) {
+      const sourceImg = sourceCard && sourceCard.querySelector(".work-img");
+      if (!sourceCard || !sourceImg) {
+        done();
+        return;
+      }
+
+      const rect = sourceImg.getBoundingClientRect();
+      const ghost = document.createElement("div");
+      const ghostImg = sourceImg.cloneNode(false);
+      ghostImg.src = sourceImg.currentSrc || sourceImg.src;
+      ghostImg.removeAttribute("loading");
+      ghost.className = "expand-ghost";
+      ghost.style.left = `${rect.left}px`;
+      ghost.style.top = `${rect.top}px`;
+      ghost.style.width = `${rect.width}px`;
+      ghost.style.height = `${rect.height}px`;
+      ghost.appendChild(ghostImg);
+      document.body.appendChild(ghost);
+
+      const targetScale = Math.min(1.1, Math.max(1.035, Math.min(window.innerWidth * .86 / rect.width, window.innerHeight * .72 / rect.height)));
+      requestAnimationFrame(() => {
+        const lift = Math.max(28, Math.min(58, rect.height * .12));
+        ghost.style.transform = `translate3d(0, -${lift}px, 0) scale(${targetScale})`;
+        ghost.style.opacity = "0";
+      });
+
+      window.setTimeout(() => {
+        ghost.remove();
+        done();
+      }, 230);
+    }
+
+    function openDetail(item, sourceCard) {
+      if (overlay.classList.contains("is-open")) return;
+      activeSourceCard = sourceCard || null;
+      activeSourceIndex = sourceCard ? Number(sourceCard.dataset.index) : -1;
+      if (sourceCard) {
+        sourceCard.classList.add("is-transition-source");
+        showDetail(item, true);
+        playZoomTransition(sourceCard, () => {
+          overlay.classList.remove("is-opening");
+        });
+        return;
+      }
+      showDetail(item, false);
+    }
+
+    function showDetail(item, opening = false) {
+      const gallery = (item.gallery || item.moreImages || [item.image]).filter(src => !/\.html($|[?#])/i.test(src));
+      overlay.classList.toggle("is-html-detail", false);
+      overlay.classList.toggle("is-image-detail", gallery.length > 1 || item.type === "image");
+      overlay.classList.toggle("is-opening", opening);
+      overlay.classList.remove("is-closing");
+      detailTitle.textContent = item.title;
+      detailDesc.textContent = item.description;
+      detailSpecs.innerHTML = `
+        <dt>업종</dt><dd>${item.industry}</dd>
+        <dt>작업분야</dt><dd>${item.field}</dd>
+        <dt>사용 프로그램</dt><dd>${item.tools}</dd>
+        <dt>제작년도</dt><dd>${item.year}</dd>
+      `;
+
+      detailMedia.innerHTML = `
+        <div class="detail-gallery">
+          ${gallery.map((src, index) => renderDetailMedia(item, src, index)).join("")}
+        </div>
+      `;
+      overlay.classList.add("is-open");
+      overlay.offsetHeight;
+      overlay.classList.add("is-visible");
+      overlay.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      const detailScroller = overlay.querySelector(".detail");
+      if (detailScroller) detailScroller.scrollTop = 0;
+    }
+
+    function closeDetail() {
+      if (detailClosing || !overlay.classList.contains("is-open")) return;
+      detailClosing = true;
+      overlay.classList.remove("is-opening");
+      overlay.classList.add("is-closing");
+      const sourceCard = activeSourceCard || (activeSourceIndex >= 0 ? cards[activeSourceIndex] : null);
+      if (sourceCard) sourceCard.classList.remove("is-transition-source");
+
+      overlay.classList.remove("is-visible");
+      overlay.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+      setTimeout(() => {
+        overlay.classList.remove("is-open");
+        overlay.classList.remove("is-closing");
+        activeSourceCard = null;
+        activeSourceIndex = -1;
+        detailClosing = false;
+      }, 520);
+    }
+
+    function overlayPointerDown(event) {
+      if (!overlay.classList.contains("is-open") || detailClosing) return;
+      const detailScroller = overlay.querySelector(".detail");
+      overlayTap = {
+        x: event.clientX,
+        y: event.clientY,
+        time: performance.now(),
+        scrollTop: detailScroller ? detailScroller.scrollTop : 0,
+        moved: false,
+        ignore: Boolean(event.target.closest(".ba-wrap, a, button, input, textarea, select"))
+      };
+    }
+
+    function overlayPointerMove(event) {
+      if (!overlayTap) return;
+      const dx = event.clientX - overlayTap.x;
+      const dy = event.clientY - overlayTap.y;
+      if (Math.hypot(dx, dy) > 7) overlayTap.moved = true;
+    }
+
+    function overlayPointerUp(event) {
+      if (!overlayTap || !overlay.classList.contains("is-open") || detailClosing) return;
+      const detailScroller = overlay.querySelector(".detail");
+      const dx = event.clientX - overlayTap.x;
+      const dy = event.clientY - overlayTap.y;
+      const moved = Math.hypot(dx, dy);
+      const scrollDelta = detailScroller ? Math.abs(detailScroller.scrollTop - overlayTap.scrollTop) : 0;
+      const held = performance.now() - overlayTap.time;
+      const shouldClose = !overlayTap.ignore && !overlayTap.moved && moved < 7 && scrollDelta < 1 && held < 520;
+      overlayTap = null;
+      if (shouldClose) closeDetail();
+    }
+
+    function setupBeforeAfter() {
+      const wrap = document.getElementById("baWrap");
+      const after = document.getElementById("baAfter");
+      const line = document.getElementById("baLine");
+      const setPos = clientX => {
+        const rect = wrap.getBoundingClientRect();
+        const pct = Math.max(4, Math.min(96, ((clientX - rect.left) / rect.width) * 100));
+        after.style.clipPath = `inset(0 0 0 ${pct}%)`;
+        line.style.left = `${pct}%`;
+      };
+      wrap.addEventListener("pointerdown", event => {
+        wrap.setPointerCapture(event.pointerId);
+        setPos(event.clientX);
+      });
+      wrap.addEventListener("pointermove", event => {
+        if (event.buttons) setPos(event.clientX);
+      });
+    }
+
+    filtersEl.addEventListener("click", event => {
+      const button = event.target.closest("button[data-filter]");
+      if (!button) return;
+      state.filter = button.dataset.filter;
+      renderFilters();
+      renderCards();
+    });
+    track.addEventListener("click", event => {
+      const card = event.target.closest(".work-card");
+      if (!card || state.dragging || state.moved) return;
+      const index = Number(card.dataset.index);
+      state.target = index;
+      state.index = index;
+      state.glideVelocity = 0;
+      openDetail(state.items[index], card);
+    });
+    showroom.addEventListener("pointerdown", pointerDown);
+    showroom.addEventListener("pointermove", pointerMove);
+    showroom.addEventListener("pointerup", pointerUp);
+    showroom.addEventListener("pointercancel", pointerUp);
+    showroom.addEventListener("wheel", wheelMove, { passive: true });
+    closeBtn.addEventListener("click", closeDetail);
+    overlay.addEventListener("pointerdown", overlayPointerDown);
+    overlay.addEventListener("pointermove", overlayPointerMove);
+    overlay.addEventListener("pointerup", overlayPointerUp);
+    overlay.addEventListener("pointercancel", () => { overlayTap = null; });
+    window.addEventListener("keydown", event => {
+      if (event.key === "Escape") closeDetail();
+      if (event.key === "ArrowRight") { state.target = clampIndex(state.index + 1); state.index = state.target; state.glideVelocity = 0; startAnimation(); }
+      if (event.key === "ArrowLeft") { state.target = clampIndex(state.index - 1); state.index = state.target; state.glideVelocity = 0; startAnimation(); }
+    });
+    window.addEventListener("resize", () => {
+      measureStep();
+      updateTransforms(true);
+    });
+
+    async function initShowroom() {
+      portfolioItems = await loadPortfolioItems();
+      categories = [...new Set([
+        ...baseCategories,
+        ...portfolioItems
+          .map(item => item.category)
+          .filter(category => category && !hiddenCategoryLabels.has(category))
+      ])];
+      state.items = [...portfolioItems];
+      renderFilters();
+      renderCards();
+    }
+
+    initShowroom();
+  </script>
+</body>
+</html>

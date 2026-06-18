@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1600">
+  <rect width="900" height="1600" fill="#161616"/>
+  <rect x="54" y="56" width="792" height="1488" rx="22" fill="#ece4d2"/>
+  <rect x="98" y="104" width="704" height="462" rx="18" fill="#282018"/>
+  <circle cx="450" cy="335" r="170" fill="#b9462f"/>
+  <circle cx="450" cy="335" r="126" fill="#eddfbf"/>
+  <path d="M230 668h440" stroke="#111" stroke-width="22"/>
+  <path d="M180 790h540M180 910h540M180 1030h540" stroke="#111" stroke-width="10" opacity=".75"/>
+  <text x="450" y="676" text-anchor="middle" font-size="86" font-weight="800" font-family="Arial, sans-serif" fill="#111">해장국</text>
+  <text x="450" y="1240" text-anchor="middle" font-size="52" font-weight="700" font-family="Arial, sans-serif" fill="#111">MENU DESIGN</text>
+  <text x="450" y="1336" text-anchor="middle" font-size="34" font-family="Arial, sans-serif" fill="#333">대표 메뉴가 먼저 보이는 구성</text>
+</svg>

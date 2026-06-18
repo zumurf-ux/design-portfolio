@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1600">
+  <rect width="900" height="1600" fill="#111"/>
+  <rect x="72" y="74" width="756" height="1452" rx="28" fill="#202020"/>
+  <rect x="128" y="134" width="644" height="428" rx="18" fill="#d8d1c0"/>
+  <rect x="128" y="628" width="300" height="360" rx="14" fill="#7c8f9b"/>
+  <rect x="472" y="628" width="300" height="360" rx="14" fill="#b7a47b"/>
+  <text x="450" y="1138" text-anchor="middle" font-size="78" font-weight="900" font-family="Arial, sans-serif" fill="#fff">소담마켓</text>
+  <text x="450" y="1226" text-anchor="middle" font-size="40" font-family="Arial, sans-serif" fill="#bbb">DETAIL PAGE</text>
+  <rect x="198" y="1330" width="504" height="68" rx="34" fill="#f5f5f5"/>
+  <text x="450" y="1377" text-anchor="middle" font-size="30" font-weight="800" font-family="Arial, sans-serif" fill="#111">BUYING FLOW</text>
+</svg>

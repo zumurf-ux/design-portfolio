@@ -1323,6 +1323,27 @@
     },
     
     {
+        "title":  "카페",
+        "category":  "포트폴리오",
+        "industry":  "외식업",
+        "field":  "이미지 갤러리",
+        "type":  "image",
+        "image":  "html-gallery/%EC%B9%B4%ED%8E%98/2a825e69-70b6-4419-a0d0-7f1ac470d3e2.png",
+        "gallery":  [
+                        "html-gallery/%EC%B9%B4%ED%8E%98/2a825e69-70b6-4419-a0d0-7f1ac470d3e2.png",
+                        "html-gallery/%EC%B9%B4%ED%8E%98/65067f8e-a921-4905-96b7-243dc4ec207e.png",
+                        "html-gallery/%EC%B9%B4%ED%8E%98/1647e52a-cc70-4109-ac2b-2cee5bf52072.png",
+                        "html-gallery/%EC%B9%B4%ED%8E%98/7bcdae30-66fd-4c32-8dd3-2a6b93b0fa0d.png",
+                        "html-gallery/%EC%B9%B4%ED%8E%98/7a632130-a339-4867-baed-70421d08f690.png",
+                        "html-gallery/%EC%B9%B4%ED%8E%98/e2eb68e3-a073-43df-8440-00ecae1048f9.png",
+                        "html-gallery/%EC%B9%B4%ED%8E%98/3ecc7e4e-7b7c-4305-a7b2-3118ec6f5134.png",
+                        "html-gallery/%EC%B9%B4%ED%8E%98/b67ccf0a-64ea-4703-b97f-03a650290005.png"
+                    ],
+        "description":  "",
+        "tools":  "",
+        "year":  "2026"
+    },
+    {
         "title":  "카페 boxod",
         "category":  "포트폴리오",
         "industry":  "외식업",

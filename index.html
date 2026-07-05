@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#f5f5f5">
+  <meta name="theme-color" content="#080d16">
   <title>디자인하는삼촌 | 모바일 포트폴리오 쇼룸</title>
   <style>
     :root {
-      color-scheme: light;
-      --bg: #f5f5f5;
+      color-scheme: dark;
+      --bg: #080d16;
       --text: #111111;
       --muted: rgba(17, 17, 17, .58);
       --soft: rgba(17, 17, 17, .08);
@@ -19,10 +19,25 @@
       --ease: cubic-bezier(.22, 1, .36, 1);
       --glass: rgba(245, 245, 245, .105);
       --glass-strong: rgba(245, 245, 245, .18);
+      --bg-x1: 104%;
+      --bg-y1: -6%;
+      --bg-x2: -8%;
+      --bg-y2: 106%;
+      --bg-glow: .3;
+      --bg-soft: .17;
     }
 
     * { box-sizing: border-box; }
-    html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--text); }
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at var(--bg-x1) var(--bg-y1), rgba(52, 230, 197, var(--bg-glow)) 0, rgba(52, 230, 197, .16) 9%, rgba(52, 230, 197, .045) 18%, transparent 30%),
+        radial-gradient(circle at var(--bg-x2) var(--bg-y2), rgba(20, 180, 142, var(--bg-soft)) 0, rgba(20, 180, 142, .1) 10%, rgba(20, 180, 142, .035) 20%, transparent 32%),
+        radial-gradient(circle at 52% 42%, rgba(15, 34, 48, .2) 0, transparent 28%),
+        linear-gradient(145deg, #0b101a 0%, #090f18 48%, #050a12 100%);
+      color: var(--text);
+    }
     body {
       font-family: Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-weight: 500;
@@ -35,7 +50,11 @@
     .app {
       position: relative;
       min-height: 100svh;
-      background: var(--bg);
+      background:
+        radial-gradient(circle at var(--bg-x1) var(--bg-y1), rgba(52, 230, 197, var(--bg-glow)) 0, rgba(52, 230, 197, .16) 9%, rgba(52, 230, 197, .045) 18%, transparent 30%),
+        radial-gradient(circle at var(--bg-x2) var(--bg-y2), rgba(20, 180, 142, var(--bg-soft)) 0, rgba(20, 180, 142, .1) 10%, rgba(20, 180, 142, .035) 20%, transparent 32%),
+        radial-gradient(circle at 52% 42%, rgba(15, 34, 48, .2) 0, transparent 28%),
+        linear-gradient(145deg, #0b101a 0%, #090f18 48%, #050a12 100%);
       isolation: isolate;
       overflow: visible;
       transition: filter .32s ease, opacity .32s ease;
@@ -338,83 +357,6 @@
       transition: transform .2s linear;
     }
 
-    .contact-bar {
-      position: fixed;
-      left: 12px;
-      right: 12px;
-      bottom: calc(10px + env(safe-area-inset-bottom));
-      z-index: 160;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      max-width: 520px;
-      margin: 0 auto;
-    }
-    .contact-bar a {
-      min-height: 42px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      border-radius: 8px;
-      border: 0;
-      background: rgba(255,255,255,.46);
-      color: rgba(17,17,17,.72);
-      text-decoration: none;
-      font-size: 12px;
-      font-weight: 500;
-      letter-spacing: .08em;
-      white-space: nowrap;
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.7),
-        0 12px 34px rgba(0,0,0,.12);
-      opacity: .58;
-      transition: transform .24s var(--ease), opacity .24s var(--ease), background .24s var(--ease);
-    }
-    .contact-bar svg {
-      width: 15px;
-      height: 15px;
-      flex: 0 0 auto;
-      stroke: currentColor;
-      stroke-width: 1.9;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      fill: none;
-      opacity: .82;
-    }
-    .contact-bar .kakao-icon text {
-      fill: currentColor;
-      stroke: none;
-      font-size: 10px;
-      font-weight: 700;
-      font-family: Arial, sans-serif;
-    }
-    .contact-bar a:hover,
-    .contact-bar a:focus-visible {
-      opacity: 1;
-      transform: translateY(-2px);
-      background: rgba(255,255,255,.7);
-    }
-    .contact-bar a:active {
-      opacity: .88;
-      transform: translateY(.5px) scale(.992);
-      background: rgba(255,255,255,.62);
-      box-shadow:
-        inset 0 1px 3px rgba(0,0,0,.07),
-        0 8px 22px rgba(0,0,0,.1);
-    }
-    .copyright {
-      grid-column: 1 / -1;
-      color: rgba(17,17,17,.42);
-      font-size: 10px;
-      text-align: center;
-      letter-spacing: 0;
-      line-height: 1.2;
-      padding-top: 1px;
-      font-weight: 400;
-      pointer-events: none;
-    }
-
     .overlay {
       position: fixed;
       inset: 0;
@@ -685,22 +627,6 @@
     
   </main>
 
-  <div class="contact-bar" aria-label="문의하기">
-      <a href="tel:010-0000-0000">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 3.8 9 3.2l2.1 4.7-1.4 1.1c1 2 2.5 3.5 4.4 4.5l1.2-1.4 4.7 2.1-.7 2.5c-.3 1.1-1.3 1.8-2.4 1.7C10.4 18 5.2 12.8 4.8 6.2c-.1-1.1.7-2.1 1.8-2.4Z"/></svg>
-        <span>PHONE</span>
-      </a>
-      <a href="sms:010-0000-0000">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6.5h14a2 2 0 0 1 2 2v6.4a2 2 0 0 1-2 2H9l-4.2 3v-3H5a2 2 0 0 1-2-2V8.5a2 2 0 0 1 2-2Z"/><path d="M7.5 10.4h9M7.5 13.3h6"/></svg>
-        <span>SMS</span>
-      </a>
-      <a href="https://pf.kakao.com/" target="_blank" rel="noreferrer">
-        <svg class="kakao-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.3c5 0 9 3 9 6.7s-4 6.7-9 6.7c-.8 0-1.6-.1-2.4-.3L5.7 20l1-3.7C4.4 15.1 3 13.2 3 11c0-3.7 4-6.7 9-6.7Z"/><text x="12" y="14.4" text-anchor="middle">K</text></svg>
-        <span>KAKAOTALK</span>
-      </a>
-      <div class="copyright">© 2026 디자인하는삼촌 All rights reserved.</div>
-    </div>
-
   <aside class="overlay" id="overlay" aria-hidden="true">
     <div class="detail">
       <div class="detail-shell">
@@ -765,6 +691,7 @@
     let detailHistoryOpen = false;
     let lockedScrollY = 0;
     let logoToneTicking = false;
+    let backgroundTicking = false;
     const logoToneCanvas = document.createElement("canvas");
     const logoToneCtx = logoToneCanvas.getContext("2d", { willReadFrequently: true });
     const visualState = new WeakMap();
@@ -897,14 +824,37 @@
         const luminance = sampleImageLuminance(img, sampleX, sampleY);
         if (luminance !== null) luminances.push(luminance);
       });
-      const average = luminances.length ? luminances.reduce((sum, value) => sum + value, 0) / luminances.length : 245;
-      brandLogo.classList.toggle("is-light", average < 118);
+      if (!luminances.length) {
+        brandLogo.classList.add("is-light");
+        return;
+      }
+      const average = luminances.reduce((sum, value) => sum + value, 0) / luminances.length;
+      brandLogo.classList.toggle("is-light", average < 150);
     }
 
     function scheduleLogoToneUpdate() {
       if (logoToneTicking) return;
       logoToneTicking = true;
       requestAnimationFrame(updateLogoTone);
+    }
+
+    function updateScrollGradient() {
+      backgroundTicking = false;
+      const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      const progress = Math.min(1, Math.max(0, window.scrollY / maxScroll));
+      const wave = Math.sin(progress * Math.PI);
+      document.documentElement.style.setProperty("--bg-x1", `${104 - progress * 6}%`);
+      document.documentElement.style.setProperty("--bg-y1", `${-6 + progress * 10}%`);
+      document.documentElement.style.setProperty("--bg-x2", `${-8 + progress * 7}%`);
+      document.documentElement.style.setProperty("--bg-y2", `${106 - progress * 10}%`);
+      document.documentElement.style.setProperty("--bg-glow", String(.25 + wave * .12));
+      document.documentElement.style.setProperty("--bg-soft", String(.12 + progress * .09));
+    }
+
+    function scheduleScrollGradientUpdate() {
+      if (backgroundTicking) return;
+      backgroundTicking = true;
+      requestAnimationFrame(updateScrollGradient);
     }
 
     function renderFilters() {
@@ -1528,8 +1478,12 @@
       measureStep();
       updateTransforms(true);
       scheduleLogoToneUpdate();
+      scheduleScrollGradientUpdate();
     });
-    window.addEventListener("scroll", scheduleLogoToneUpdate, { passive: true });
+    window.addEventListener("scroll", () => {
+      scheduleLogoToneUpdate();
+      scheduleScrollGradientUpdate();
+    }, { passive: true });
 
     async function initShowroom() {
       portfolioItems = await loadPortfolioItems();
@@ -1545,6 +1499,7 @@
       updateTransforms(true);
       finishLoading();
       scheduleLogoToneUpdate();
+      scheduleScrollGradientUpdate();
     }
 
     initShowroom().catch(() => {
@@ -1552,6 +1507,7 @@
       renderCards();
       finishLoading();
       scheduleLogoToneUpdate();
+      scheduleScrollGradientUpdate();
     });
   </script>
 </body>
